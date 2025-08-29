@@ -1,181 +1,231 @@
+# 🌱 CarbonX - AI-Powered Carbon Credit Trading Platform
 
-# CarbonX - AI-Powered Carbon Credits Platform
+> **Next-generation sustainability platform combining AI tools, carbon credit trading, and blockchain technology for environmental impact management.**
 
-CarbonX is a Next.js-based platform for trading carbon credits with AI-powered calculations and portfolio management. Built with [thirdweb](https://thirdweb.com/) and [Next.js](https://nextjs.org/).
+[![Next.js](https://img.shields.io/badge/Next.js-14.2.5-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![Google AI](https://img.shields.io/badge/Google_AI-Gemini-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/)
 
-## Features
+## 🚀 Live Demo
 
-- 🤖 **AI Carbon Calculator**: Get instant, AI-powered carbon credit calculations using Google Gemini AI
-- 💱 **Trading Platform**: Trade carbon credits with real-time market data
-- 📊 **Portfolio Management**: Track and manage your carbon credit investments
-- 🌱 **Sustainable Alternatives**: Discover eco-friendly alternatives for various industries
-- 📱 **Event Planner**: Plan sustainable events with carbon footprint tracking
-- 🌊 **Plastic Tracker**: Visualize and track plastic waste footprint
+**🔗 [Visit CarbonX Platform](http://localhost:3002)** *(Running locally)*
 
-## Installation
+## ✨ Features
 
-Install the template using [thirdweb create](https://portal.thirdweb.com/cli/create)
+### 🤖 AI-Powered Tools
+- **AI Carbon Calculator** - Instant carbon footprint analysis with emission calculations and credit recommendations
+- **AI Plastic Footprint** - Smart plastic waste analysis with reduction strategies and sustainable alternatives  
+- **Sustainable Event Planner** - AI-powered eco-friendly event planning with carbon tracking
+- **FAQ Chatbot** - Intelligent assistant powered by Google Gemini AI for instant platform support
 
+### 💹 Carbon Trading & Finance
+- **Secure Trading Platform** - Buy and sell verified carbon credits from certified projects
+- **Portfolio Management** - Track carbon credit investments and environmental impact
+- **Real-time Analytics** - Live market data and sustainability metrics
+- **Cryptocurrency Integration** - Support for carbon-related crypto investments and green tokens
+
+### 🌐 Web3 & Blockchain
+- **Smart Contracts** - Ethereum-based carbon credit tokenization and trading
+- **MetaMask Integration** - Secure wallet connectivity and transaction management
+- **ThirdWeb Integration** - Simplified Web3 development and deployment
+
+### 🎨 User Experience
+- **Modern Dark Theme** - Professional, accessible design with smooth animations
+- **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+- **Interactive Navigation** - Mega menu with organized feature categories
+- **Developer Hub** - Real-time GitHub integration with contribution charts
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **Framework**: Next.js 14.2.5 with App Router
+- **Language**: TypeScript 5.0
+- **Styling**: Tailwind CSS 3.4 + Framer Motion
+- **UI Components**: Lucide React Icons + Custom Components
+
+### AI & Backend
+- **AI Integration**: Google Generative AI (Gemini 1.5-flash)
+- **Backend**: Next.js API Routes + FastAPI (Python)
+- **Database**: PostgreSQL (planned)
+- **Authentication**: NextAuth.js
+
+### Blockchain & Web3
+- **Blockchain**: Ethereum + EVM-compatible networks
+- **Smart Contracts**: Solidity + Hardhat
+- **Web3 Library**: ThirdWeb + Ethers.js
+- **Wallet**: MetaMask integration
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18.x or higher
+- npm or yarn package manager
+- MetaMask browser extension (for Web3 features)
+- Google AI API key (for AI features)
+
+### Installation
+
+1. **Clone the repository**
 ```bash
-  npx thirdweb create app --next
-```
-
-Or clone directly:
-```bash
-git clone <your-repo-url>
+git clone https://github.com/AkshitTiwarii/carbonx.git
 cd carbonx
+```
+
+2. **Install dependencies**
+```bash
 npm install
 ```
 
-## Environment Variables
+3. **Set up environment variables**
+```bash
+cp .env.example .env.local
+```
 
-To run this project, you will need to add the following environment variables to your `.env.local` file:
-
+Add your API keys to `.env.local`:
 ```env
-# Gemini AI API Key (Required for AI Calculator)
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# ThirdWeb Client ID (Required for Web3 features)
-CLIENT_ID=your_thirdweb_client_id
-
-# NextAuth URL (Optional, for authentication)
-NEXTAUTH_URL=http://localhost:3000
+GEMINI_API_KEY=your_google_ai_api_key_here
+THIRDWEB_API_KEY=your_thirdweb_api_key_here
+NEXTAUTH_URL=http://localhost:3002
 ```
 
-### Setting up Gemini AI API Key
-
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the generated API key
-5. Add it to your `.env.local` file as `GEMINI_API_KEY=your_api_key_here`
-
-To learn how to create a thirdweb client ID, refer to the [client documentation](https://portal.thirdweb.com/typescript/v5/client). 
-
-## Run locally
-
-Install dependencies
-
+4. **Start the development server**
 ```bash
-yarn
-```
-
-Start development server
-
-```bash
-yarn dev
-```
-
-Create a production build
-
-```bash
-yarn build
-```
-
-Preview the production build
-
-```bash
-yarn start
-```
-
-## Resources
-
-- [Documentation](https://portal.thirdweb.com/typescript/v5)
-- [Templates](https://thirdweb.com/templates)
-- [YouTube](https://www.youtube.com/c/thirdweb)
-- [Blog](https://blog.thirdweb.com)
-
-## Need help?
-
-For help or feedback, please [visit our support site](https://thirdweb.com/support)
-
----
-
-# CarbonX Full-Stack Extensions
-
-This project has been extended with:
-
-- `backend/` — FastAPI server with auth and trading endpoints
-- `smart_contracts/` — Hardhat workspace with a CarbonCreditToken ERC-20
-- Frontend pages: `/login`, `/signup`, `/dashboard`
-
-## Run Backend (FastAPI)
-
-```powershell
-cd backend
-python -m venv .venv
-. .venv/Scripts/Activate.ps1
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
-
-## Run Frontend (Next.js)
-
-```powershell
-npm install
 npm run dev
 ```
 
-Set environment variables in `.env`:
+5. **Open your browser**
+Navigate to `http://localhost:3002` to see the application.
+
+## 📱 Application Structure
 
 ```
-NEXT_PUBLIC_TEMPLATE_CLIENT_ID=YOUR_THIRDWEB_CLIENT_ID
-NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000
-# Optional: server-only thirdweb key (do NOT prefix with NEXT_PUBLIC)
-THIRDWEB_SECRET_KEY=your_thirdweb_secret_key
+carbonx/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── ai-calculator/      # AI Carbon Calculator
+│   │   ├── plastic-calculator/ # AI Plastic Footprint
+│   │   ├── event-planner/      # Sustainable Event Planner
+│   │   ├── faqs/              # FAQ with AI Chatbot
+│   │   ├── developer/         # Developer Hub
+│   │   ├── trading/           # Carbon Credit Trading
+│   │   ├── portfolio/         # Investment Portfolio
+│   │   └── api/               # API Routes
+│   ├── components/            # Reusable UI Components
+│   ├── hooks/                 # Custom React Hooks
+│   ├── lib/                   # Utility Libraries
+│   └── types/                 # TypeScript Definitions
+├── smart_contracts/           # Ethereum Smart Contracts
+├── backend/                   # Python FastAPI Backend
+└── public/                    # Static Assets
 ```
 
-## Run Contracts (Hardhat)
+## 🤖 AI Features
 
-```powershell
-cd smart_contracts
-npm install
-npm run build
-npm run node
-# in another terminal
-npm run deploy
+### Carbon Calculator
+- Real-time emission calculations using AI models
+- Personalized carbon credit recommendations
+- Integration with verified offset projects
+
+### Plastic Footprint Analyzer
+- Comprehensive plastic waste impact analysis
+- AI-powered reduction strategy suggestions
+- Sustainable product alternative recommendations
+
+### Event Planner
+- Sustainable event planning with AI assistance
+- Carbon footprint estimation for events
+- Eco-friendly vendor and location suggestions
+
+### Chatbot Assistant
+- 24/7 platform support powered by Google Gemini
+- Comprehensive knowledge base about CarbonX features
+- Natural language understanding for user queries
+
+## 🔗 API Documentation
+
+### AI Calculator API
+```typescript
+POST /api/ai-calculator
+Content-Type: application/json
+
+{
+  "transport": "car",
+  "energy": "electricity",
+  "waste": "recycling",
+  "consumption": "moderate"
+}
 ```
 
-Copy the deployed address into the Dashboard Token panel to interact (mint/test).
-
-## Troubleshooting Dashboard API
-
-The Dashboard calls the FastAPI backend on `NEXT_PUBLIC_API_BASE` (default: `http://127.0.0.1:8000`). If you see errors near `apiGet`/`fetch`:
-
-1. Ensure the backend is running on port 8000 (see "Run Backend").
-2. If you changed the port, set the env var before starting Next:
-
-```powershell
-$env:NEXT_PUBLIC_API_BASE = "http://127.0.0.1:8001"; npm run dev
+### Trading API
+```typescript
+GET /api/trading/prices
+Response: Array of carbon credit prices and market data
 ```
 
-3. The API helper has an 8s timeout and improved error messages to help identify connection issues.
-
-## Engine-based ERC1155 Mint (Server)
-
-Environment variables for Engine (set in `.env` or your host env):
-
-```
-THIRDWEB_SECRET_KEY=your_thirdweb_secret_key
-# Optional: Engine base URL (defaults to https://api.thirdweb.com/v1/transactions)
-THIRDWEB_ENGINE_URL=https://api.thirdweb.com/v1/transactions
-# Required if you don't provide `from` in API requests
-THIRDWEB_SERVER_WALLET=0xYourServerWalletAddress
+### Portfolio API
+```typescript
+GET /api/crypto/prices?category=all
+Response: Real-time cryptocurrency and carbon token prices
 ```
 
-New API routes (Next.js App Router):
+## 🌍 Environmental Impact
 
-- POST `/api/engine/erc1155/claim`
-  - Body (default signature): `{ chainId, contractAddress, to, tokenId, quantity, from? }`
-  - Or custom: `{ chainId, contractAddress, method, params, from? }`
-  - Returns Engine transaction object (e.g., `{ id, status, ... }`).
+CarbonX is committed to sustainability:
+- **Carbon Neutral Platform**: All operations offset through verified projects
+- **Transparency**: Open-source codebase and public impact metrics
+- **Education**: Free tools and resources for carbon footprint awareness
+- **Innovation**: Advancing Web3 solutions for environmental challenges
 
-- GET `/api/engine/tx?id=...`
-  - Fetch a transaction by id to check status/hash.
+## 🤝 Contributing
 
-PowerShell example to enqueue a mint:
+We welcome contributions from the community! Here's how you can help:
 
-```powershell
-$body = @{ chainId = "137"; contractAddress = "0x..."; to = "0x..."; tokenId = 0; quantity = 1 } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://localhost:3000/api/engine/erc1155/claim -ContentType application/json -Body $body
-```
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+4. **Push to the branch** (`git push origin feature/amazing-feature`)
+5. **Open a Pull Request**
+
+### Development Guidelines
+- Follow TypeScript best practices
+- Use Tailwind CSS for styling
+- Write tests for new features
+- Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Developer
+
+**Akshit Tiwari**
+- 🐙 GitHub: [@AkshitTiwarii](https://github.com/AkshitTiwarii)
+- 💼 LinkedIn: [akshit-tiwarii](https://www.linkedin.com/in/akshit-tiwarii/)
+- 📧 Email: akshittiwari29@gmail.com
+
+## 🙏 Acknowledgments
+
+- [Google AI](https://ai.google.dev/) for Gemini AI integration
+- [ThirdWeb](https://thirdweb.com/) for Web3 development tools
+- [Vercel](https://vercel.com/) for Next.js framework
+- [Tailwind CSS](https://tailwindcss.com/) for styling system
+- Open source carbon data providers and environmental organizations
+
+## 📊 Project Stats
+
+- **Languages**: TypeScript, Python, Solidity
+- **Framework**: Next.js 14 with App Router  
+- **AI Integration**: Google Gemini 1.5-flash
+- **Blockchain**: Ethereum smart contracts
+- **UI/UX**: Modern dark theme with responsive design
+
+---
+
+<div align="center">
+
+**🌱 Building a sustainable future with AI and blockchain technology**
+
+[⭐ Star this repository](https://github.com/AkshitTiwarii/carbonx) if you find it helpful!
+
+</div>
