@@ -35,3 +35,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python cache (for backend)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS generated files
+desktop.ini
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Hardhat files (for smart contracts)
+cache/
+artifacts/

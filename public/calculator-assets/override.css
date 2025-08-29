@@ -1,0 +1,53 @@
+/* CarbonX compatibility overrides - minimal, non-destructive */
+:root{
+  --container-xl: 1120px; /* narrower content to match site */
+}
+html, body {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+}
+/* Tighten headings and ensure contrast in dark mode */
+.header__title h1 { font-size: 22px !important; font-weight: 700; letter-spacing: -0.01em; }
+.dashboard__header h2 { font-size: 18px !important; font-weight: 650; }
+.chart-container h3, .prediction-section h3, .feature-importance h3 { font-size: 16px !important; }
+.header__title p { color: rgba(229,231,235,0.85); }
+
+/* Global heading scale inside iframe */
+body h1 { font-size: 22px !important; }
+body h2 { font-size: 18px !important; }
+body h3 { font-size: 15px !important; }
+
+/* Layout + spacing tweaks inside iframe */
+.container { max-width: min(1120px, 100%); }
+.header { padding: 10px 0 !important; }
+.main { padding: 10px 0 16px !important; }
+.section { margin-bottom: 14px !important; }
+.metrics-grid { gap: 10px !important; }
+.charts-section { gap: 14px !important; }
+
+/* Card polish */
+.metric-card, .scope-card, .card, .feature-importance, .prediction-section, .chart-container, .emission-form {
+  backdrop-filter: saturate(110%) blur(2px);
+  border-color: rgba(148,163,184,0.18);
+}
+
+/* Metric value scale */
+.metric-card__value span { font-size: 20px !important; }
+.metric-card, .chart-container { padding: 14px !important; }
+
+/* Status badges slightly smaller */
+.status { font-size: 12px !important; padding: 2px 6px !important; border-radius: 6px !important; }
+
+/* Buttons sizing to match nav aesthetics */
+.btn.btn--sm { padding: 6px 12px; border-radius: 8px; }
+.btn { border-radius: 10px; padding: 7px 12px; font-size: 13px; }
+
+/* Charts responsive height */
+.chart-wrapper { min-height: 220px; }
+
+/* Fix hidden sections initial state visibility jumps */
+.hidden { display: none !important; }
+
+/* Improve grid gaps on small screens */
+@media (max-width: 480px) {
+  .metrics-grid, .industry-grid, .form-grid { gap: 10px; }
+}

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" data-color-scheme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Credit Prediction Platform</title>
+    <base href="/calculator-assets/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="override.css?v=2">
+    <!-- Use Chart.js UMD build to expose global `Chart` in window -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header__content">
+                <div class="header__title">
+                    <h1>Carbon Credit Prediction Platform</h1>
+                    <p>AI-Powered Emissions Analysis & Forecasting</p>
+                </div>
+                <div class="header__actions">
+                    <button class="btn btn--outline btn--sm" id="exportBtn">Export Report</button>
+                    <button class="btn btn--primary btn--sm" id="refreshBtn">Refresh Data</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section">
+                <div class="dashboard">
+                    <div class="dashboard__header">
+                        <h2>Overview Dashboard</h2>
+                        <div class="status-indicators">
+                            <div class="status status--success">System Active</div>
+                            <div class="status status--info">ML Models Updated</div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-card__header">
+                                <h3>Total Emissions</h3>
+                                <span class="metric-trend trend-up">+2.3%</span>
+                            </div>
+                            <div class="metric-card__value">
+                                <span id="totalEmissions">8,450</span>
+                                <small>tCO₂e</small>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-card__header">
+                                <h3>Carbon Credits Required</h3>
+                                <span class="metric-trend trend-down">-1.8%</span>
+                            </div>
+                            <div class="metric-card__value">
+                                <span id="creditsRequired">1,250</span>
+                                <small>credits</small>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-card__header">
+                                <h3>Estimated Cost</h3>
+                                <span class="metric-trend trend-up">+5.2%</span>
+                            </div>
+                            <div class="metric-card__value">
+                                <span id="estimatedCost">$106,500</span>
+                                <small>USD</small>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-card__header">
+                                <h3>Compliance Status</h3>
+                                <span class="status status--warning">Attention</span>
+                            </div>
+                            <div class="metric-card__value">
+                                <span id="complianceScore">87</span>
+                                <small>%</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-container">
+                            <h3>Emissions Trend Analysis</h3>
+                            <div class="chart-wrapper" style="position: relative; height: 300px;">
+                                <canvas id="emissionsChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h3>Industry Comparison</h3>
+                            <div class="chart-wrapper" style="position: relative; height: 300px;">
+                                <canvas id="industryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Industry Selection Section -->
+            <section id="industrySelection" class="section">
+                <div class="industry-selection">
+                    <h2>Select Your Industry</h2>
+                    <p>Choose your industry to access customized emission calculation parameters.</p>
+                    
+                    <div class="industry-grid">
+                        <div class="industry-card" data-industry="manufacturing">
+                            <h3>Manufacturing</h3>
+                            <p>Production volume, energy consumption, fuel usage</p>
+                            <span class="industry-factor">0.52 tCO₂e/unit</span>
+                        </div>
+                        
+                        <div class="industry-card" data-industry="automotive">
+                            <h3>Automotive</h3>
+                            <p>Vehicle production, assembly energy, paint shop</p>
+                            <span class="industry-factor">8.5 tCO₂e/vehicle</span>
+                        </div>
+                        
+                        <div class="industry-card" data-industry="steel">
+                            <h3>Steel Production</h3>
+                            <p>Raw materials, furnace operations, electricity</p>
+                            <span class="industry-factor">2.3 tCO₂e/ton</span>
+                        </div>
+                        
+                        <div class="industry-card" data-industry="cement">
+                            <h3>Cement</h3>
+                            <p>Limestone calcination, kiln fuel, grinding</p>
+                            <span class="industry-factor">0.7 tCO₂e/ton</span>
+                        </div>
+                        
+                        <div class="industry-card" data-industry="chemical">
+                            <h3>Chemical Industry</h3>
+                            <p>Process heat, reactions, steam generation</p>
+                            <span class="industry-factor">1.5 tCO₂e/ton</span>
+                        </div>
+                        
+                        <div class="industry-card" data-industry="power">
+                            <h3>Power Generation</h3>
+                            <p>Fuel type, generation capacity, efficiency</p>
+                            <span class="industry-factor">820 tCO₂e/GWh</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Input Forms -->
+            <section id="dataInput" class="section hidden">
+                <div class="data-input">
+                    <div class="form-header">
+                        <h2>Industry Parameters</h2>
+                        <p>Enter your operational data for accurate emission calculations.</p>
+                        <button class="btn btn--outline btn--sm" id="backToIndustries">← Back to Industries</button>
+                    </div>
+
+                    <form id="emissionForm" class="emission-form">
+                        <div class="form-grid" id="formFields">
+                            <!-- Dynamic form fields will be inserted here -->
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn--secondary" id="resetForm">Reset Form</button>
+                            <button type="submit" class="btn btn--primary">Calculate Emissions</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <section id="loadingSection" class="section hidden">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <h3>Processing Data with ML Models</h3>
+                    <p>Running Random Forest, XGBoost, and LSTM algorithms...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div id="loadingStatus">Initializing models...</div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results" class="section hidden">
+                <div class="results">
+                    <div class="results-header">
+                        <h2>Emission Analysis Results</h2>
+                        <div class="ml-confidence">
+                            <span class="status status--success">ML Confidence: <span id="mlConfidence">92%</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Emissions Breakdown -->
+                    <div class="emissions-breakdown">
+                        <div class="scope-card">
+                            <h3>Scope 1 Emissions</h3>
+                            <div class="scope-value">
+                                <span id="scope1Value">2,500</span>
+                                <small>tCO₂e</small>
+                            </div>
+                            <p>Direct emissions from operations</p>
+                        </div>
+                        
+                        <div class="scope-card">
+                            <h3>Scope 2 Emissions</h3>
+                            <div class="scope-value">
+                                <span id="scope2Value">1,800</span>
+                                <small>tCO₂e</small>
+                            </div>
+                            <p>Indirect emissions from energy</p>
+                        </div>
+                        
+                        <div class="scope-card">
+                            <h3>Scope 3 Emissions</h3>
+                            <div class="scope-value">
+                                <span id="scope3Value">4,200</span>
+                                <small>tCO₂e</small>
+                            </div>
+                            <p>Value chain emissions</p>
+                        </div>
+                    </div>
+
+                    <!-- Prediction Chart -->
+                    <div class="prediction-section">
+                        <h3>12-Month Emission Forecast</h3>
+                        <div class="chart-wrapper" style="position: relative; height: 400px;">
+                            <canvas id="predictionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Carbon Credits Calculation -->
+                    <div class="credits-section">
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>Carbon Credits Required</h3>
+                                <div class="credits-breakdown">
+                                    <div class="credit-item">
+                                        <span>Total Excess Emissions:</span>
+                                        <strong id="excessEmissions">1,250 tCO₂e</strong>
+                                    </div>
+                                    <div class="credit-item">
+                                        <span>Voluntary Market Price:</span>
+                                        <strong>$15.50/credit</strong>
+                                    </div>
+                                    <div class="credit-item">
+                                        <span>Compliance Market Price:</span>
+                                        <strong>$85.20/credit</strong>
+                                    </div>
+                                    <div class="credit-item total">
+                                        <span>Estimated Total Cost:</span>
+                                        <strong id="totalCreditCost">$106,500</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recommendations Section -->
+            <section id="recommendations" class="section hidden">
+                <div class="recommendations">
+                    <h2>AI-Powered Recommendations</h2>
+                    <p>Optimize your carbon footprint with these strategic recommendations.</p>
+                    
+                    <div class="recommendations-grid" id="recommendationsGrid">
+                        <!-- Recommendations will be populated dynamically -->
+                    </div>
+
+                    <div class="feature-importance">
+                        <h3>Emission Factor Importance</h3>
+                        <div class="chart-wrapper" style="position: relative; height: 300px;">
+                            <canvas id="featureChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal for Reports -->
+    <div id="reportModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Generate Report</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Report Type</label>
+                    <select class="form-control" id="reportType">
+                        <option value="summary">Executive Summary</option>
+                        <option value="detailed">Detailed Analysis</option>
+                        <option value="compliance">Compliance Report</option>
+                        <option value="forecast">Forecast Report</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Format</label>
+                    <select class="form-control" id="reportFormat">
+                        <option value="pdf">PDF Document</option>
+                        <option value="csv">CSV Data</option>
+                        <option value="json">JSON Export</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary" id="cancelReport">Cancel</button>
+                <button class="btn btn--primary" id="generateReport">Generate Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+</html>

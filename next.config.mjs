@@ -5,6 +5,13 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  redirects: async () => [
+    {
+      source: "/carbon-calculator",
+      destination: "/calculator",
+      permanent: false,
+    },
+  ],
 };
 
 export default nextConfig;
