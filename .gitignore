@@ -6,6 +6,12 @@
 .pnp.js
 .yarn/install-state.gz
 
+# Smart contracts dependencies and build artifacts
+smart_contracts/node_modules/
+smart_contracts/cache/
+smart_contracts/artifacts/
+smart_contracts/typechain-types/
+
 # testing
 /coverage
 
@@ -26,8 +32,23 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+# local env files
 .env*.local
-.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Smart contracts deployment artifacts
+smart_contracts/deployments/
+smart_contracts/.openzeppelin/
+
+# Temporary scripts and batch files
+*.bat
+deploy-contract.bat
+deploy.bat
+redeploy-contract.bat
+start-*.bat
 
 # vercel
 .vercel
