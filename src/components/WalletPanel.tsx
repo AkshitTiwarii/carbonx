@@ -1,29 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { getSigner } from "../lib/web3";
+import { ConnectButton } from "thirdweb/react";
+import { client } from "../app/client";
 
 export default function WalletPanel() {
-  const [address, setAddress] = useState<string | null>(null);
-
-  async function connect() {
-    try {
-      const signer = await getSigner();
-      const addr = await signer.getAddress();
-      setAddress(addr);
-    } catch (e: any) {
-      alert(e.message);
-    }
-  }
-
   return (
-    <div className="bg-white rounded shadow p-6">
-      <h3 className="text-lg font-semibold text-green-700 mb-2">Wallet</h3>
-      {address ? (
-        <p className="text-gray-700">Connected: {address}</p>
-      ) : (
-        <button onClick={connect} className="px-4 py-2 bg-blue-600 text-white rounded">Connect MetaMask</button>
-      )}
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+      <h3 className="text-xl font-semibold text-zinc-100 mb-4">Wallet Connection</h3>
+      <div className="space-y-4">
+        <ConnectButton client={client} />
+        <p className="text-zinc-400 text-sm">
+          Connect your wallet to start trading carbon credits and managing your portfolio.
+        </p>
+      </div>
     </div>
   );
 }

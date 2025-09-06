@@ -38,9 +38,7 @@ export default function NavBar() {
 
 				{/* Desktop Navigation */}
 				<nav className="hidden lg:flex items-center text-sm text-zinc-300 space-x-2 nav-links">
-					<button onClick={() => setOpen(true)} className="px-3 py-1.5 rounded-full hover:bg-zinc-800/60 transition-colors">Features</button>
-					<Link href="/trading" className="px-3 py-1.5 rounded-full hover:bg-zinc-800/60 transition-colors">Trading</Link>
-					<Link href="/portfolio" className="px-3 py-1.5 rounded-full hover:bg-zinc-800/60 transition-colors">Portfolio</Link>
+					<button onClick={() => setOpen(true)} className="px-3 py-1.5 rounded-full hover:bg-zinc-800/60 transition-colors">Menu</button>
 					
 					{/* AI Tools Dropdown */}
 					<div className="relative">
@@ -96,22 +94,8 @@ export default function NavBar() {
 							onClick={() => { setOpen(true); setMobileMenuOpen(false); }}
 							className="block w-full text-left px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"
 						>
-							Features
+							Menu
 						</button>
-						<Link 
-							href="/trading" 
-							onClick={() => setMobileMenuOpen(false)}
-							className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"
-						>
-							Trading
-						</Link>
-						<Link 
-							href="/portfolio" 
-							onClick={() => setMobileMenuOpen(false)}
-							className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"
-						>
-							Portfolio
-						</Link>
 						
 						{/* AI Tools Section */}
 						<div className="py-2">

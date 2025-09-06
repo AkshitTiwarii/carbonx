@@ -55,7 +55,7 @@ class CarbonCreditContract {
   private contract: ethers.Contract | null = null;
   private signer: ethers.Signer | null = null;
 
-  async initialize(provider: any) {
+  async initialize(provider: any, retryCount = 0, maxRetries = 3): Promise<void> {
     if (!provider) throw new Error('Provider not available');
     
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
@@ -63,21 +63,35 @@ class CarbonCreditContract {
     
     if (!contractAddress) throw new Error('Contract address not configured');
 
-    const ethersProvider = new ethers.BrowserProvider(provider);
-    this.signer = await ethersProvider.getSigner();
-    
-    console.log('Signer address:', await this.signer.getAddress());
-    console.log('Network:', await ethersProvider.getNetwork());
-    
-    this.contract = new ethers.Contract(contractAddress, CONTRACT_ABI, this.signer);
-    
-    // Test contract connection by calling a simple view function
     try {
-      const currentTokenId = await this.contract.getCurrentTokenId();
+      const ethersProvider = new ethers.BrowserProvider(provider);
+      this.signer = await ethersProvider.getSigner();
+      
+      console.log('Signer address:', await this.signer.getAddress());
+      console.log('Network:', await ethersProvider.getNetwork());
+      
+      this.contract = new ethers.Contract(contractAddress, CONTRACT_ABI, this.signer);
+      
+      // Test contract connection by calling a simple view function with timeout
+      const connectionTest = Promise.race([
+        this.contract.getCurrentTokenId(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Connection timeout')), 5000)
+        )
+      ]);
+      
+      const currentTokenId = await connectionTest;
       console.log('Contract connected successfully! Current token ID:', currentTokenId.toString());
     } catch (error) {
       console.error('Contract connection test failed:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      // If it's a circuit breaker error and we haven't exhausted retries
+      if (errorMessage.includes('circuit breaker') && retryCount < maxRetries) {
+        console.log(`Retrying connection in ${(retryCount + 1) * 2} seconds... (${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 2000));
+        return this.initialize(provider, retryCount + 1, maxRetries);
+      }
       throw new Error('Failed to connect to contract: ' + errorMessage);
     }
   }

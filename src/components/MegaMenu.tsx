@@ -3,18 +3,29 @@
 import Link from "next/link";
 import { useEffect } from "react";
 
-type Props = { isOpen: boolean; onClose: () => void };
+interface MegaMenuProps { 
+  isOpen: boolean; 
+  onClose: () => void; 
+}
 
-export default function MegaMenu({ isOpen, onClose }: Props) {
+export default function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    const onScroll = () => onClose();
+    
+    // Only close on page scroll, not on menu scroll
+    const onPageScroll = (e: Event) => {
+      // Only respond to scroll events on the main window, not within the menu
+      if (e.target === document || e.target === document.body) {
+        onClose();
+      }
+    };
+    
     window.addEventListener("keydown", onKey);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onPageScroll, { passive: true });
     return () => {
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onPageScroll);
     };
   }, [isOpen, onClose]);
 
@@ -25,13 +36,13 @@ export default function MegaMenu({ isOpen, onClose }: Props) {
       <button aria-label="Close menu" onClick={onClose} className="absolute inset-0 bg-black/50" />
 
       {/* Panel */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-4 md:top-8 w-[96%] md:w-[95%] max-w-6xl rounded-3xl border border-zinc-800 bg-zinc-900/70 backdrop-blur-xl shadow-2xl overflow-hidden">
+      <div onClick={(e) => e.stopPropagation()} className="absolute left-1/2 -translate-x-1/2 top-4 md:top-8 w-[96%] md:w-[95%] max-w-6xl rounded-3xl border border-zinc-800 bg-zinc-900/70 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Top bar with brand and close */}
         <div className="flex items-center justify-between px-4 md:px-6 py-3">
           <div className="flex items-center gap-6">
             <Link href="/" className="font-semibold text-zinc-100">CarbonX</Link>
             <nav className="hidden md:flex items-center gap-4 text-sm text-zinc-300">
-              <span className="font-medium">Features ▾</span>
+              <span className="font-medium">Menu ▾</span>
               <Link href="/developer" className="hover:underline">Developer</Link>
               <Link href="/cryptocurrencies" className="hover:underline">Cryptocurrencies</Link>
             </nav>
@@ -46,29 +57,36 @@ export default function MegaMenu({ isOpen, onClose }: Props) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-4 md:p-6">
           {/* Left: feature tiles */}
           <div className="md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <FeatureTile title="Marketplace" text="Browse verified carbon credits" color="from-orange-500 to-red-500" href="/marketplace" badge="HOT"/>
             <FeatureTile title="Trading" text="Trade carbon credits" color="from-indigo-500 to-blue-600" href="/trading" badge="NEW"/>
             <FeatureTile title="Portfolio" text="Track crypto assets" color="from-violet-500 to-purple-600" href="/portfolio" badge="NEW"/>
+            <FeatureTile title="Toucan Protocol" text="Real blockchain carbon credits" color="from-emerald-500 to-teal-600" href="/toucan-demo" badge="NEW"/>
             <FeatureTile title="AI Calculator" text="AI-powered carbon credits" color="from-green-500 to-emerald-600" href="/ai-calculator" badge="AI"/>
-            <FeatureTile title="Buy" text="Turn cash to crypto" color="from-orange-500 to-amber-500" href="/features/buy" badge="ETH"/>
             <FeatureTile title="Event Planner" text="Plan sustainable events" color="from-emerald-500 to-green-600" href="/event-planner" badge="NEW"/>
-            <FeatureTile title="Plastic Calculator" text="AI plastic footprint analysis" color="from-blue-500 to-cyan-600" href="/plastic-calculator" badge="AI"/>
           </div>
 
           {/* Right: explore more */}
           <div className="md:col-span-3">
-            <div className="rounded-2xl bg-zinc-900/50 border border-zinc-800 p-4 sticky top-4">
+            <div className="rounded-2xl bg-zinc-900/50 border border-zinc-800 p-4">
               <div className="text-sm font-semibold text-zinc-100 mb-3">Explore more</div>
               <ul className="space-y-2 text-sm">
-                <li><Link onClick={onClose} href="/trading" className="text-zinc-200 hover:underline">🔄 Trading Platform</Link></li>
+                <li><Link onClick={onClose} href="/marketplace" className="text-zinc-200 hover:underline">� Carbon Marketplace</Link></li>
+                <li><Link onClick={onClose} href="/trading" className="text-zinc-200 hover:underline">� Trading Platform</Link></li>
                 <li><Link onClick={onClose} href="/portfolio" className="text-zinc-200 hover:underline">📊 Crypto Portfolio</Link></li>
+                <li><Link onClick={onClose} href="/toucan-demo" className="text-zinc-200 hover:underline">🌿 Toucan Protocol</Link></li>
                 <li><Link onClick={onClose} href="/ai-calculator" className="text-zinc-200 hover:underline">🤖 AI Carbon Calculator</Link></li>
                 <li><Link onClick={onClose} href="/plastic-calculator" className="text-zinc-200 hover:underline">♻️ Plastic Calculator</Link></li>
                 <li><Link onClick={onClose} href="/event-planner" className="text-zinc-200 hover:underline">📅 Event Planner</Link></li>
                 <li><Link onClick={onClose} href="/sustainable-alternatives" className="text-zinc-200 hover:underline">🌱 Sustainable Alternatives</Link></li>
-                <li><Link onClick={onClose} href="/platforms" className="text-zinc-200 hover:underline">Platforms</Link></li>
-                <li><Link onClick={onClose} href="/security" className="text-zinc-200 hover:underline">Security</Link></li>
+                <li><Link onClick={onClose} href="/features" className="text-zinc-200 hover:underline">⭐ All Features</Link></li>
+              </ul>
+              
+              <div className="text-sm font-semibold text-zinc-100 mb-3 mt-6">Resources</div>
+              <ul className="space-y-2 text-sm">
                 <li><Link onClick={onClose} href="/learn" className="text-zinc-200 hover:underline">Learn</Link></li>
                 <li><Link onClick={onClose} href="/faqs" className="text-zinc-200 hover:underline">FAQs</Link></li>
+                <li><Link onClick={onClose} href="/security" className="text-zinc-200 hover:underline">Security</Link></li>
+                <li><Link onClick={onClose} href="/platforms" className="text-zinc-200 hover:underline">Platforms</Link></li>
               </ul>
               <div className="mt-4 pt-4 border-t border-zinc-800 text-xs text-zinc-400">
                 About CarbonX

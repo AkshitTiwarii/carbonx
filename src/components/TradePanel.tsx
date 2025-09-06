@@ -1,48 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { apiGet, apiPost } from "../lib/api";
+import Link from "next/link";
 
 export default function TradePanel() {
-  const [price, setPrice] = useState<number | null>(null);
-  const [amount, setAmount] = useState(10);
-  const [status, setStatus] = useState<string>("");
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const d = await apiGet<{ symbol: string; price: number }>("/api/credits/price");
-        if (active) setPrice(d.price);
-      } catch (e: any) {
-        if (active) setStatus(e?.message || "Failed to load price");
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  async function trade(action: "buy" | "sell") {
-    setStatus("Submitting...");
-    try {
-      const res = await apiPost<{ status: string }>("/api/credits/trade", { amount, action });
-      setStatus(`Trade ${res.status}`);
-    } catch (e: any) {
-      setStatus(e.message);
-    }
-  }
-
   return (
-    <div className="bg-white rounded shadow p-6">
-      <h3 className="text-lg font-semibold text-green-700 mb-2">Trade CO2C</h3>
-  <p className="text-gray-700 mb-2">Current Price: {price !== null ? `$${price}` : "loading..."}</p>
-      <div className="flex gap-2 items-center mb-4">
-        <input type="number" className="border p-2 rounded w-24" value={amount} onChange={(e) => setAmount(parseInt(e.target.value))} />
-        <button onClick={() => trade("buy")} className="px-4 py-2 bg-green-600 text-white rounded">Buy</button>
-        <button onClick={() => trade("sell")} className="px-4 py-2 bg-red-600 text-white rounded">Sell</button>
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+      <h3 className="text-xl font-semibold text-zinc-100 mb-4">Trading Hub</h3>
+      <div className="space-y-3">
+        <Link 
+          href="/marketplace" 
+          className="block w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-center py-2 px-4 rounded transition-colors"
+        >
+          Carbon Marketplace
+        </Link>
+        <Link 
+          href="/trading" 
+          className="block w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-center py-2 px-4 rounded transition-colors"
+        >
+          Advanced Trading
+        </Link>
+        <Link 
+          href="/toucan-demo" 
+          className="block w-full bg-emerald-800 hover:bg-emerald-700 text-zinc-100 text-center py-2 px-4 rounded transition-colors"
+        >
+          Toucan Protocol
+        </Link>
       </div>
-      <p className="text-sm text-gray-500">{status}</p>
     </div>
   );
 }
