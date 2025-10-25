@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
       const prompt = `
 You are a helpful AI assistant for CarbonX, a carbon credit trading and sustainability platform. You should answer questions based on the following knowledge base and be helpful, informative, and professional.

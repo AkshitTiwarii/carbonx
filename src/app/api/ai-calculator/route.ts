@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use AI to analyze and calculate everything
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     
     const calculationPrompt = `
 You are an expert carbon accountant and sustainability consultant. Analyze this business/project description and provide a comprehensive carbon footprint calculation.
@@ -101,8 +101,64 @@ Provide realistic, industry-standard calculations based on current emission fact
       }
       
       calculation = JSON.parse(cleanedResponse);
-    } catch (parseError) {
+    } catch (parseError: any) {
       console.error('AI response parsing error:', parseError);
+      
+      // Check if it's a rate limit error or model not found error
+      if (parseError?.status === 429 || parseError?.status === 404 || parseError?.message?.includes('RATE_LIMIT_EXCEEDED') || parseError?.message?.includes('not found')) {
+        // Return a helpful fallback response for rate limiting or model errors
+        return NextResponse.json({
+          success: true,
+          rateLimited: true,
+          data: {
+            industry: "General Business",
+            subIndustry: "Service Sector",
+            region: "Global",
+            analysisNotes: "Demo calculation - AI service temporarily unavailable due to rate limits. This is a sample calculation based on typical business operations.",
+            totalEmissions: 150,
+            scope1: 30,
+            scope2: 50,
+            scope3: 70,
+            creditsNeeded: 165,
+            confidence: 0.6,
+            calculationMethod: "Sample calculation based on industry averages. For accurate calculations, please try again later when AI service is available.",
+            emissionFactors: {
+              source: "Industry standard emission factors",
+              methodology: "Placeholder calculation - AI quota exceeded"
+            },
+            recommendedCredits: [
+              {
+                type: "VCS",
+                name: "Verified Carbon Standard Credits",
+                quantity: 165,
+                priceRange: [15, 25],
+                totalCost: 3300,
+                quality: "high",
+                reasoning: "Widely recognized standard suitable for general carbon offsetting"
+              }
+            ],
+            reductionStrategies: [
+              {
+                strategy: "Energy Efficiency Improvements",
+                potentialReduction: "20-30%",
+                timeframe: "6-12 months",
+                cost: "$5,000-$15,000"
+              },
+              {
+                strategy: "Renewable Energy Transition",
+                potentialReduction: "40-60%",
+                timeframe: "12-24 months",
+                cost: "$20,000-$50,000"
+              }
+            ],
+            explanation: "This is a sample calculation provided because the AI service has reached its rate limit. Your actual emissions may vary. For a precise AI-powered analysis, please try again in a few minutes. In the meantime, this estimate is based on typical small to medium business operations with moderate energy consumption.",
+            query,
+            timestamp: new Date().toISOString()
+          },
+          message: "AI service temporarily unavailable (model access issue or rate limit). Showing sample calculation. Please check your API key configuration or try again later."
+        });
+      }
+      
       return NextResponse.json(
         { success: false, error: 'Failed to parse AI calculation. Please try rephrasing your query.' },
         { status: 500 }

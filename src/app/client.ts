@@ -5,9 +5,10 @@ import { ethereum } from "thirdweb/chains";
 const clientId =
   process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID ||
   process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID ||
-  process.env.NEXT_PUBLIC_CLIENT_ID;
+  process.env.NEXT_PUBLIC_CLIENT_ID || 
+  "your-client-id"; // Fallback to prevent null client
 
-export const client = clientId ? createThirdwebClient({ clientId }) : null as any;
+export const client = clientId ? createThirdwebClient({ clientId }) : null;
 
 export function getThirdwebClient() {
   return client;

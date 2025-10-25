@@ -183,6 +183,9 @@ export default function AutoSlideshow() {
                 setCurrentSlide(index);
                 setKey(prev => prev + 1);
               }}
+              aria-label={`Go to slide ${index + 1}`}
+              title={`Go to slide ${index + 1}`}
+              aria-current={index === currentSlide ? "true" : "false"}
               className={`w-3 h-3 rounded-full transition-all ${
                 index === currentSlide
                   ? "bg-indigo-500 scale-125"

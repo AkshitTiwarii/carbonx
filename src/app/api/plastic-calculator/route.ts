@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use AI to analyze and calculate plastic footprint
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Use AI to analyze plastic footprint
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     
     const calculationPrompt = `
 You are an expert in plastic waste management and environmental impact assessment. Analyze this business/project/event description and provide a comprehensive plastic footprint calculation.
@@ -123,8 +123,52 @@ Provide realistic calculations based on current plastic usage patterns and waste
       }
       
       calculation = JSON.parse(cleanedResponse);
-    } catch (parseError) {
+    } catch (parseError: any) {
       console.error('AI response parsing error:', parseError);
+      
+      // Check if it's a rate limit error or model not found error
+      if (parseError?.status === 429 || parseError?.status === 404 || parseError?.message?.includes('RATE_LIMIT_EXCEEDED') || parseError?.message?.includes('not found')) {
+        // Return a helpful fallback response for rate limiting or model errors
+        return NextResponse.json({
+          success: true,
+          rateLimited: true,
+          data: {
+            plasticFootprint: {
+              totalAnnualPlastic: 500,
+              singleUsePlastic: 300,
+              recyclablePlastic: 150,
+              nonRecyclablePlastic: 50,
+              microplasticImpact: 25
+            },
+            breakdown: [
+              { category: "Packaging", amount: 200, percentage: 40 },
+              { category: "Single-use items", amount: 150, percentage: 30 },
+              { category: "Products", amount: 100, percentage: 20 },
+              { category: "Other", amount: 50, percentage: 10 }
+            ],
+            sustainableAlternatives: [
+              {
+                currentItem: "Plastic water bottles",
+                alternative: "Reusable water bottles",
+                reductionPercent: 95,
+                costComparison: "cheaper",
+                availability: "widely_available"
+              }
+            ],
+            confidence: 0.6,
+            explanation: "This is a sample calculation provided because the AI service has reached its rate limit. For a precise AI-powered analysis, please try again in a few minutes.",
+            recommendations: [
+              "Switch to reusable alternatives where possible",
+              "Implement a plastic reduction policy",
+              "Partner with sustainable suppliers"
+            ],
+            query,
+            timestamp: new Date().toISOString()
+          },
+          message: "AI service temporarily unavailable (model access issue or rate limit). Showing sample calculation."
+        });
+      }
+      
       return NextResponse.json(
         { success: false, error: 'Failed to parse AI calculation. Please try rephrasing your query.' },
         { status: 500 }
