@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('GEMINI_API_KEY is not defined in environment variables');
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Don't throw at module load time if the API key is missing — that causes build-time failures
+// on platforms (like Vercel) when env vars aren't set during certain build steps.
+// Initialize the client inside the request handler when possible.
+let genAI: any = null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +17,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+  // model will be created below once genAI is initialized
 
     const prompt = `You are an expert sustainable event planner with deep knowledge of environmental impact, cost optimization, and practical implementation. Analyze the following event details and provide comprehensive sustainability recommendations.
 
@@ -98,6 +97,19 @@ Provide practical, actionable recommendations that are specific to the event typ
 
     let analysisData;
     try {
+      if (genAI === null) {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (apiKey) {
+          genAI = new GoogleGenerativeAI(apiKey);
+        }
+      }
+
+      if (!genAI) {
+        // No API key / client available — skip AI call and use fallback analysis directly
+        throw new Error('GEMINI_API_KEY not available; using fallback analysis');
+      }
+
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
