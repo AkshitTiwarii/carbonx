@@ -1,0 +1,286 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+
+interface MegaMenuProps { 
+  isOpen: boolean; 
+  onClose: () => void; 
+}
+
+// Animation variants for feature tiles
+const tileVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      damping: 14,
+      stiffness: 200
+    }
+  }
+};
+
+export default function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    
+    // Only close on page scroll, not on menu scroll
+    const onPageScroll = (e: Event) => {
+      // Only respond to scroll events on the main window, not within the menu
+      if (e.target === document || e.target === document.body) {
+        onClose();
+      }
+    };
+    
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", onPageScroll, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onPageScroll);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-[60] overflow-hidden">
+      {/* Background blur effect */}
+      <div className="absolute inset-0 backdrop-blur-sm"></div>
+      
+      {/* Backdrop */}
+      <motion.button 
+        aria-label="Close menu" 
+        onClick={onClose} 
+        className="absolute inset-0 bg-black/60"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* Panel */}
+      <motion.div 
+        onClick={(e) => e.stopPropagation()} 
+        className="fixed left-1/2 top-1/2 w-[96%] md:w-[90%] max-w-6xl rounded-3xl border border-zinc-800 bg-zinc-900/90 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+        style={{ transform: "translate(-50%, -50%)" }}
+        initial={{ opacity: 0, y: -50, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ 
+          type: "spring", 
+          damping: 20, 
+          stiffness: 250
+        }}
+      >
+        {/* Top bar with brand and close */}
+        <motion.div 
+          className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-zinc-800/50"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.3 }}
+        >
+          <motion.div 
+            className="flex items-center gap-6"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+          >
+            <Link href="/" className="font-bold text-xl text-white hover:text-emerald-300 transition-colors">CarbonX</Link>
+            <nav className="hidden md:flex items-center gap-6 text-sm text-zinc-300">
+              <span className="font-medium text-emerald-400">Menu ▾</span>
+              <Link href="/developer" className="hover:text-emerald-300 transition-colors">Developer</Link>
+              <Link href="/cryptocurrencies" className="hover:text-emerald-300 transition-colors">Cryptocurrencies</Link>
+            </nav>
+          </motion.div>
+          <motion.div 
+            className="flex items-center gap-3"
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.25, type: "spring", stiffness: 100 }}
+          >
+            <Link href="/dashboard" className="hidden md:inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2 text-sm font-medium hover:shadow-lg hover:from-emerald-400 hover:to-emerald-500 transition-all">Get App</Link>
+            <motion.button 
+              onClick={onClose} 
+              className="h-10 w-10 inline-flex items-center justify-center rounded-full bg-zinc-800 text-white hover:bg-zinc-700 transition-colors"
+              whileHover={{ scale: 1.05, backgroundColor: "#27272a" }}
+              whileTap={{ scale: 0.95 }}
+            >
+              ✕
+            </motion.button>
+          </motion.div>
+        </motion.div>
+
+        {/* Content grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-4 md:p-6">
+          {/* Left: feature tiles */}
+          <div className="md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <FeatureTile index={0} title="Marketplace" text="Browse verified carbon credits" color="from-orange-500 to-red-500" href="/marketplace" badge="HOT"/>
+            <FeatureTile index={1} title="Trading" text="Trade carbon credits" color="from-indigo-500 to-blue-600" href="/trading" badge="NEW"/>
+            <FeatureTile index={2} title="Portfolio" text="Track crypto assets" color="from-violet-500 to-purple-600" href="/portfolio" badge="NEW"/>
+            <FeatureTile index={3} title="Toucan Protocol" text="Real blockchain carbon credits" color="from-emerald-500 to-teal-600" href="/toucan-demo" badge="NEW"/>
+            <FeatureTile index={4} title="AI Calculator" text="AI-powered carbon credits" color="from-green-500 to-emerald-600" href="/ai-calculator" badge="AI"/>
+            <FeatureTile index={5} title="Event Planner" text="Plan sustainable events" color="from-emerald-500 to-green-600" href="/event-planner" badge="NEW"/>
+          </div>
+
+          {/* Right: explore more */}
+          <motion.div 
+            className="md:col-span-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+          >
+            <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800/80 p-5 shadow-lg">
+              <motion.div 
+                className="text-sm font-bold text-emerald-400 mb-4 uppercase tracking-wider"
+                initial={{ opacity: 0, x: -5 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                Explore more
+              </motion.div>
+              
+              <ul className="space-y-2 text-sm">
+                <MenuItem delay={0.5} href="/marketplace">💰 Carbon Marketplace</MenuItem>
+                <MenuItem delay={0.55} href="/trading">📈 Trading Platform</MenuItem>
+                <MenuItem delay={0.6} href="/portfolio">📊 Crypto Portfolio</MenuItem>
+                <MenuItem delay={0.65} href="/toucan-demo">🌿 Toucan Protocol</MenuItem>
+                <MenuItem delay={0.7} href="/ai-calculator">🤖 AI Carbon Calculator</MenuItem>
+                <MenuItem delay={0.75} href="/plastic-calculator">♻️ Plastic Calculator</MenuItem>
+                <MenuItem delay={0.8} href="/event-planner">📅 Event Planner</MenuItem>
+                <MenuItem delay={0.85} href="/sustainable-alternatives">🌱 Sustainable Alternatives</MenuItem>
+                <MenuItem delay={0.9} href="/features">⭐ All Features</MenuItem>
+              </ul>
+              
+              <motion.div 
+                className="text-sm font-bold text-emerald-400 mb-4 mt-8 uppercase tracking-wider"
+                initial={{ opacity: 0, x: -5 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.95 }}
+              >
+                Resources
+              </motion.div>
+              
+              <ul className="space-y-2 text-sm">
+                <MenuItem delay={1.0} href="/learn">Learn</MenuItem>
+                <MenuItem delay={1.05} href="/faqs">FAQs</MenuItem>
+                <MenuItem delay={1.1} href="/security">Security</MenuItem>
+                <MenuItem delay={1.15} href="/platforms">Platforms</MenuItem>
+              </ul>
+              
+              <motion.div 
+                className="mt-6 pt-5 border-t border-zinc-800/50 text-xs text-zinc-400"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2, duration: 0.5 }}
+              >
+                <span className="font-semibold text-zinc-300">About CarbonX</span>
+                <div className="mt-3 flex gap-4">
+                  <Link onClick={onClose} href="/support" className="hover:text-emerald-300 transition-colors">Support</Link>
+                  <Link onClick={onClose} href="/blog" className="hover:text-emerald-300 transition-colors">Blog</Link>
+                  <Link onClick={onClose} href="/careers" className="hover:text-emerald-300 transition-colors">Careers</Link>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function MenuItem({ children, href, delay }: { children: React.ReactNode, href: string, delay: number }) {
+  return (
+    <motion.li
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        delay, 
+        type: "spring", 
+        stiffness: 300, 
+        damping: 20 
+      }}
+      whileHover={{ x: 5 }}
+    >
+      <Link 
+        href={href} 
+        className="text-zinc-200 hover:text-white transition-all duration-200 flex items-center gap-2 py-1"
+      >
+        {children}
+      </Link>
+    </motion.li>
+  );
+}
+
+function FeatureTile({ title, text, color, href, badge, index }: { title: string; text: string; color: string; href: string; badge?: string; index: number }) {
+  return (
+    <motion.div
+      variants={tileVariants}
+      initial="hidden"
+      animate="visible"
+      transition={{ delay: 0.1 + (index * 0.05) }}
+      whileHover={{ 
+        scale: 1.03, 
+        transition: { duration: 0.2 } 
+      }}
+    >
+      <Link 
+        href={href} 
+        className={`group relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-br ${color} text-white p-5 min-h-[140px] flex items-end w-full transition-all duration-300 hover:shadow-xl`}
+      >
+        {/* Animated glow effect */}
+        <motion.div 
+          className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_20%,white,transparent_60%)]" 
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ 
+            duration: 4, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        {/* Content */}
+        <div className="relative">
+          <motion.div 
+            className="text-2xl font-bold drop-shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 + (index * 0.05) }}
+          >
+            {title}
+          </motion.div>
+          <motion.div 
+            className="text-sm opacity-90"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.9 }}
+            transition={{ delay: 0.3 + (index * 0.05) }}
+          >
+            {text}
+          </motion.div>
+        </div>
+        
+        {/* Badge */}
+        {badge && (
+          <motion.span 
+            className="absolute top-3 right-3 text-[10px] px-2 py-1 rounded-full bg-white/90 text-zinc-800 font-medium"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 500,
+              damping: 15,
+              delay: 0.4 + (index * 0.05)
+            }}
+          >
+            {badge}
+          </motion.span>
+        )}
+      </Link>
+    </motion.div>
+  );
+}

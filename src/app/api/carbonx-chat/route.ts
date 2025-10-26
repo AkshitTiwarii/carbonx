@@ -8,7 +8,8 @@ if (!API_KEY) {
   console.warn('Warning: No Gemini API key found. Chatbot will use fallback responses.');
 }
 
-const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
+// Lazy initialize the Gemini client to avoid side-effects at module load time
+let genAI: any = null;
 
 const CARBONX_KNOWLEDGE_BASE = `
 CarbonX Platform Knowledge Base:
@@ -120,6 +121,11 @@ export async function POST(request: NextRequest) {
         { error: 'Message is required' },
         { status: 400 }
       );
+    }
+
+    // Lazy-init the Gemini client for this request if an API key exists
+    if (genAI === null && API_KEY) {
+      genAI = new GoogleGenerativeAI(API_KEY);
     }
 
     // If no API key or genAI is not available, use fallback responses

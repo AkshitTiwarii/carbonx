@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+// Initialize per-request to avoid build-time failures when env is missing
+let genAI: any = null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,6 +78,27 @@ Please provide a detailed analysis in the following JSON format (respond ONLY wi
   "alternatives": [
     {
       "currentItem": "plastic_item",
+    // Initialize Gemini client for this request if possible
+    if (genAI === null) {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (apiKey) genAI = new GoogleGenerativeAI(apiKey);
+    }
+
+    if (!genAI) {
+      // Return a helpful fallback when the AI key isn't available
+      return NextResponse.json({
+        success: true,
+        rateLimited: true,
+        data: {
+          materialType: 'Mixed Plastics',
+          weightKg: 1000,
+          recycledPercent: 20,
+          projectedSavingsKgCO2e: 800,
+          notes: 'Fallback sample: GEMINI_API_KEY not configured in environment. Set key to enable AI calculations.'
+        },
+        message: 'AI service not configured. Showing sample calculation.'
+      });
+    }
       "alternative": "sustainable_alternative",
       "reductionPercent": percentage_reduction,
       "costComparison": "cheaper|same|more_expensive",
