@@ -12,6 +12,14 @@ export async function POST(request: NextRequest) {
       if (apiKey) genAI = new GoogleGenerativeAI(apiKey);
     }
 
+    // Debugging: log boolean presence of key and whether client was initialized
+    try {
+      console.log('ai-calculator: GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
+      console.log('ai-calculator: genAI initialized?', !!genAI);
+    } catch (e) {
+      // swallow logging errors
+    }
+
     const { query, generateReport } = await request.json();
     
     if (!query) {
@@ -122,7 +130,7 @@ Provide realistic, industry-standard calculations based on current emission fact
       
       calculation = JSON.parse(cleanedResponse);
     } catch (parseError: any) {
-      console.error('AI response parsing error:', parseError);
+      console.error('AI response parsing error:', parseError?.status || parseError?.message || parseError);
       
       // Check if it's a rate limit error or model not found error
       if (parseError?.status === 429 || parseError?.status === 404 || parseError?.message?.includes('RATE_LIMIT_EXCEEDED') || parseError?.message?.includes('not found')) {

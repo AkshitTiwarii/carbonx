@@ -123,14 +123,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Debug: log presence of API key (boolean) and attempt to init client
+    try {
+      console.log('carbonx-chat: API_KEY present?', !!API_KEY);
+    } catch {}
+
     // Lazy-init the Gemini client for this request if an API key exists
     if (genAI === null && API_KEY) {
-      genAI = new GoogleGenerativeAI(API_KEY);
+      try {
+        genAI = new GoogleGenerativeAI(API_KEY);
+        console.log('carbonx-chat: genAI initialized');
+      } catch (initErr) {
+        console.error('carbonx-chat: genAI initialization error', initErr?.message || initErr);
+      }
     }
 
     // If no API key or genAI is not available, use fallback responses
     if (!genAI || !API_KEY) {
-      console.log('Using fallback response - no API key available');
+      console.log('carbonx-chat: Using fallback response - no API key available or init failed');
       const fallbackResponse = getFallbackResponse(message);
       return NextResponse.json({ 
         response: fallbackResponse,
@@ -172,7 +182,7 @@ Please provide a helpful response:
       });
 
     } catch (aiError: any) {
-      console.log('AI API error, using fallback:', aiError.message);
+      console.log('AI API error, using fallback:', aiError?.status || aiError?.message || aiError);
       // If AI fails, use fallback response
       const fallbackResponse = getFallbackResponse(message);
       return NextResponse.json({ 

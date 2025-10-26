@@ -104,6 +104,12 @@ Provide practical, actionable recommendations that are specific to the event typ
         }
       }
 
+      // Debugging: log key presence and client initialization (boolean only)
+      try {
+        console.log('event-planner: GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
+        console.log('event-planner: genAI initialized?', !!genAI);
+      } catch (e) {}
+
       if (!genAI) {
         // No API key / client available — skip AI call and use fallback analysis directly
         throw new Error('GEMINI_API_KEY not available; using fallback analysis');
@@ -122,7 +128,7 @@ Provide practical, actionable recommendations that are specific to the event typ
 
       analysisData = JSON.parse(jsonMatch[0]);
     } catch (error: any) {
-      console.error('Event planner AI error:', error);
+      console.error('Event planner AI error:', error?.status || error?.message || error);
       
       // Check if it's a rate limit error or model not found error
       if (error?.status === 429 || error?.status === 404 || error?.message?.includes('RATE_LIMIT_EXCEEDED') || error?.message?.includes('not found')) {
