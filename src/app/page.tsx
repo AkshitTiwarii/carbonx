@@ -30,34 +30,65 @@ export default function Home() {
       <AmbientBackground />
 
       {/* Hero */}
-      <section className="relative z-10 mx-auto max-w-7xl px-4 pt-16 pb-10 md:pt-24 md:pb-16">
-                <Reveal className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-indigo-700 text-xs mb-6 border-indigo-900 bg-indigo-900/30 text-indigo-300">
-            AI + Web3 Carbon Exchange
+      <section className="relative z-10 mx-auto max-w-7xl px-4 pt-8 pb-10 md:pt-12 md:pb-16 min-h-[700px] md:min-h-[800px]">
+        {/* Spline Animation - Center of Section */}
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-full">
+            <iframe 
+              src='https://my.spline.design/aidatamodelinteraction-OQtyoxML83rvORp2CWWxmSuB/' 
+              frameBorder='0' 
+              width='100%' 
+              height='100%'
+              className="w-full h-full"
+              style={{ border: 'none' }}
+              title="Spline AI Data Model Interaction"
+            />
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.05]">
-            Next-gen carbon credits
-            <br />
-            <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
-              Trade. Offset. Predict.
-            </span>
-          </h1>
-          <p className="mt-4 text-zinc-300 text-lg md:text-xl">
-            A futuristic marketplace that gives carbon credits real utility—transparent, liquid, and intelligent.
-          </p>
-        </Reveal>
+        </div>
 
-  <Reveal delay={150} className="mt-8 flex flex-col items-center justify-center gap-4">
-          {twClient ? (
-            <ConnectButton client={twClient} appMetadata={{ name: "CarbonX", url: "https://carbonx.local" }} />
-          ) : null}
-          <div className="flex flex-wrap items-center justify-center gap-3 btn-row">
-            <CTA href="/dashboard" label="Launch App" />
-            <CTA href="#how-it-works" label="How it works" variant="secondary" />
+        {/* Bottom gradient fade to black */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-zinc-950 via-zinc-950/95 to-zinc-950/40 z-10 pointer-events-none"></div>
+
+        {/* Text Content - Above and Below Animation */}
+        <div className="relative z-20 pointer-events-none h-full flex flex-col justify-between py-4">
+          {/* Top Section - All Text Content */}
+          <div>
+            <Reveal className="text-center max-w-4xl mx-auto">
+              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-900 bg-indigo-900/40 backdrop-blur-sm px-3 py-1 text-indigo-300 text-xs mb-6">
+                AI + Web3 Carbon Exchange
+              </div>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] text-white mb-4">
+                Next-gen carbon credits
+              </h1>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] bg-gradient-to-r from-indigo-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent mb-6">
+                Trade. Offset. Predict.
+              </h2>
+              <p className="text-zinc-300 text-base md:text-lg lg:text-xl max-w-2xl mx-auto">
+                A futuristic marketplace that gives carbon credits real utility—transparent, liquid, and intelligent.
+              </p>
+            </Reveal>
           </div>
-        </Reveal>
 
-        <Reveal delay={250} className="mt-12">
+          {/* Middle Section - Interactive Animation Space */}
+          <div className="flex-1 min-h-[200px]">
+            {/* This space is for the interactive animation */}
+          </div>
+
+          {/* Bottom Section - CTAs Only */}
+          <div>
+            <Reveal delay={150} className="flex flex-col items-center justify-center gap-4 pointer-events-auto">
+              {twClient ? (
+                <ConnectButton client={twClient} appMetadata={{ name: "CarbonX", url: "https://carbonx.local" }} />
+              ) : null}
+              <div className="flex flex-wrap items-center justify-center gap-3 btn-row">
+                <CTA href="/dashboard" label="Launch App" />
+                <CTA href="#how-it-works" label="How it works" variant="secondary" />
+              </div>
+            </Reveal>
+          </div>
+        </div>
+
+        <Reveal delay={250} className="mt-12 relative z-20 pointer-events-auto">
           <StatsRow />
         </Reveal>
       </section>
