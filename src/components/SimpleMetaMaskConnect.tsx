@@ -14,7 +14,7 @@ const MetaMaskPage = () => {
             name: "CarbonX - Carbon Credits Platform",
             url: typeof window !== "undefined" ? window.location.href : "",
           },
-          infuraAPIKey: process.env.NEXT_PUBLIC_INFURA_API_KEY || "63af025bca554eebadbbec9f4d41d986",
+          infuraAPIKey: process.env.NEXT_PUBLIC_INFURA_API_KEY || undefined,
         });
 
         const ethereum = MMSDK.getProvider();
