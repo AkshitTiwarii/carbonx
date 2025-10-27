@@ -97,37 +97,104 @@ Provide practical, actionable recommendations that are specific to the event typ
 
     let analysisData;
     try {
-      if (genAI === null) {
         const apiKey = process.env.GEMINI_API_KEY;
-        if (apiKey) {
-          genAI = new GoogleGenerativeAI(apiKey);
+        if (genAI === null) {
+          if (apiKey) {
+            genAI = new GoogleGenerativeAI(apiKey);
+          }
         }
-      }
 
-      // Debugging: log key presence and client initialization (boolean only)
-      try {
-        console.log('event-planner: GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
-        console.log('event-planner: genAI initialized?', !!genAI);
-      } catch (e) {}
+        // Debugging: log key presence and client initialization (boolean only)
+        try {
+          console.log('event-planner: GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
+          console.log('event-planner: genAI initialized?', !!genAI);
+        } catch (e) {}
 
-      if (!genAI) {
-        // No API key / client available — skip AI call and use fallback analysis directly
-        throw new Error('GEMINI_API_KEY not available; using fallback analysis');
-      }
+        if (!genAI) {
+          // No API key / client available — skip AI call and use fallback analysis directly
+          throw new Error('GEMINI_API_KEY not available; using fallback analysis');
+        }
 
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
-      const result = await model.generateContent(prompt);
-      const responseText = typeof result?.response?.text === 'function'
-        ? await result.response.text()
-        : String(result);
+        // Try candidate models, then discover available models if needed
+        const candidateModels = ['gemini-1.5-flash-latest', 'gemini-1.0', 'text-bison-001'];
+        let selectedModelInstance: any = null;
+        let chosenModelName: string | null = null;
+        let result: any = null;
 
-      // Extract JSON from the response
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No valid JSON found in AI response');
-      }
+        for (const candidate of candidateModels) {
+          try {
+            selectedModelInstance = genAI.getGenerativeModel({ model: candidate });
+            console.log('event-planner: attempting model', candidate);
+            result = await selectedModelInstance.generateContent(prompt);
+            const upstreamStatus = result?.response?.status ?? result?.status;
+            if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+              console.warn('event-planner: model', candidate, 'returned status', upstreamStatus);
+              if (upstreamStatus === 404) continue;
+              continue;
+            }
+            chosenModelName = candidate;
+            console.log('event-planner: model selected', chosenModelName);
+            break;
+          } catch (mErr) {
+            console.warn('event-planner: model', candidate, 'failed:', (mErr as any)?.message || mErr);
+            result = null;
+            continue;
+          }
+        }
 
-      analysisData = JSON.parse(jsonMatch[0]);
+        // If candidates fail, try ListModels discovery
+        if (!result) {
+          try {
+            const listUrl = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(apiKey || '')}`;
+            const listResp = await fetch(listUrl);
+            if (listResp.ok) {
+              const listJson = await listResp.json();
+              const remoteModels: string[] = (listJson?.models || [])
+                .map((m: any) => String(m?.name || ''))
+                .filter(Boolean)
+                .map((n: string) => n.replace(/^models\//, ''));
+              console.log('event-planner: discovered models from ListModels:', remoteModels.join(', '));
+              for (const remote of remoteModels) {
+                if (candidateModels.includes(remote)) continue;
+                try {
+                  selectedModelInstance = genAI.getGenerativeModel({ model: remote });
+                  console.log('event-planner: attempting discovered model', remote);
+                  const r = await selectedModelInstance.generateContent(prompt);
+                  const upstreamStatus = r?.response?.status ?? r?.status;
+                  if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+                    console.warn('event-planner: discovered model', remote, 'returned status', upstreamStatus);
+                    continue;
+                  }
+                  result = r;
+                  chosenModelName = remote;
+                  console.log('event-planner: discovered model selected', chosenModelName);
+                  break;
+                } catch (dmErr) {
+                  console.warn('event-planner: discovered model', remote, 'failed:', (dmErr as any)?.message || dmErr);
+                  continue;
+                }
+              }
+            } else {
+              console.warn('event-planner: ListModels request failed with status', listResp.status);
+            }
+          } catch (listErr) {
+            console.warn('event-planner: ListModels error:', (listErr as any)?.message || listErr);
+          }
+        }
+
+        if (!result) {
+          throw new Error('No candidate model produced a usable response');
+        }
+
+        const responseText = typeof result?.response?.text === 'function' ? await result.response.text() : String(result);
+
+        // Extract JSON from the response
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('No valid JSON found in AI response');
+        }
+
+        analysisData = JSON.parse(jsonMatch[0]);
     } catch (error: any) {
       console.error('Event planner AI error:', error?.status || error?.message || error);
       

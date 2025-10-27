@@ -150,7 +150,10 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+      // Try a list of candidate models first, then fall back to discovering models via ListModels
+      const candidateModels = ['gemini-1.5-flash-latest', 'gemini-1.0', 'text-bison-001'];
+      let selectedModelInstance: any = null;
+      let result: any = null;
 
       const prompt = `
 You are a helpful AI assistant for CarbonX, a carbon credit trading and sustainability platform. You should answer questions based on the following knowledge base and be helpful, informative, and professional.
@@ -173,24 +176,82 @@ Instructions:
 Please provide a helpful response:
 `;
 
-      const result = await model.generateContent(prompt);
+      for (const candidate of candidateModels) {
+        try {
+          selectedModelInstance = genAI.getGenerativeModel({ model: candidate });
+          console.log('carbonx-chat: attempting model', candidate);
+          result = await selectedModelInstance.generateContent(prompt);
+          const upstreamStatus = result?.response?.status ?? result?.status;
+          if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+            console.warn('carbonx-chat: model', candidate, 'returned status', upstreamStatus);
+            if (upstreamStatus === 404) continue;
+            continue;
+          }
+          console.log('carbonx-chat: model selected', candidate);
+          break;
+        } catch (mErr) {
+          console.warn('carbonx-chat: model', candidate, 'failed:', (mErr as any)?.message || mErr);
+          result = null;
+          continue;
+        }
+      }
+
+      // If none of the candidates worked, try listing models the API key can access
+      if (!result) {
+        try {
+          const apiKey = process.env.GEMINI_API_KEY || API_KEY || '';
+          const listUrl = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(apiKey || '')}`;
+          const listResp = await fetch(listUrl);
+          if (listResp.ok) {
+            const listJson = await listResp.json();
+            const remoteModels: string[] = (listJson?.models || [])
+              .map((m: any) => String(m?.name || ''))
+              .filter(Boolean)
+              .map((n: string) => n.replace(/^models\//, ''));
+            console.log('carbonx-chat: discovered models from ListModels:', remoteModels.join(', '));
+            for (const remote of remoteModels) {
+              if (candidateModels.includes(remote)) continue;
+              try {
+                selectedModelInstance = genAI.getGenerativeModel({ model: remote });
+                console.log('carbonx-chat: attempting discovered model', remote);
+                const r = await selectedModelInstance.generateContent(prompt);
+                const upstreamStatus = r?.response?.status ?? r?.status;
+                if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+                  console.warn('carbonx-chat: discovered model', remote, 'returned status', upstreamStatus);
+                  continue;
+                }
+                result = r;
+                console.log('carbonx-chat: discovered model selected', remote);
+                break;
+              } catch (dmErr) {
+                console.warn('carbonx-chat: discovered model', remote, 'failed:', (dmErr as any)?.message || dmErr);
+                continue;
+              }
+            }
+          } else {
+            console.warn('carbonx-chat: ListModels request failed with status', listResp.status);
+          }
+        } catch (listErr) {
+          console.warn('carbonx-chat: ListModels error:', (listErr as any)?.message || listErr);
+        }
+      }
+
+      if (!result) {
+        console.log('carbonx-chat: no working model found, using fallback');
+        const fallbackResponse = getFallbackResponse(message);
+        return NextResponse.json({ response: fallbackResponse, mode: 'fallback' });
+      }
+
       const responseText = typeof result?.response?.text === 'function'
         ? await result.response.text()
         : String(result);
 
-      return NextResponse.json({ 
-        response: responseText,
-        mode: 'ai'
-      });
+      return NextResponse.json({ response: responseText, mode: 'ai' });
 
     } catch (aiError: any) {
       console.log('AI API error, using fallback:', aiError?.status || aiError?.message || aiError);
-      // If AI fails, use fallback response
       const fallbackResponse = getFallbackResponse(message);
-      return NextResponse.json({ 
-        response: fallbackResponse,
-        mode: 'fallback'
-      });
+      return NextResponse.json({ response: fallbackResponse, mode: 'fallback' });
     }
 
   } catch (error: any) {

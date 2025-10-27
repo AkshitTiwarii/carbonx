@@ -70,6 +70,7 @@ export default function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
             <div className="rounded-2xl bg-zinc-900/50 border border-zinc-800 p-4">
               <div className="text-sm font-semibold text-zinc-100 mb-3">Explore more</div>
               <ul className="space-y-2 text-sm">
+                <li><Link onClick={onClose} href="/developer" className="text-zinc-200 hover:underline">• Developer</Link></li>
                 <li><Link onClick={onClose} href="/marketplace" className="text-zinc-200 hover:underline">• Carbon Marketplace</Link></li>
                 <li><Link onClick={onClose} href="/trading" className="text-zinc-200 hover:underline">• Trading Platform</Link></li>
                 <li><Link onClick={onClose} href="/portfolio" className="text-zinc-200 hover:underline">📊 Crypto Portfolio</Link></li>

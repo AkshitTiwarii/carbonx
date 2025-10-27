@@ -40,9 +40,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+  const apiKey = process.env.GEMINI_API_KEY;
 
-    const calculationPrompt = `
+  const candidateModels = ['gemini-1.5-flash-latest', 'gemini-1.0', 'text-bison-001'];
+  let selectedModelInstance: any = null;
+  let chosenModelName: string | null = null;
+
+  const calculationPrompt = `
 You are an expert in plastic waste management and environmental impact assessment. Analyze this business/project/event description and provide a comprehensive plastic footprint calculation.
 
 Description: "${query}"
@@ -126,7 +130,73 @@ Provide realistic calculations based on current plastic usage patterns and waste
 
     let calculation: any;
     try {
-      const result = await model.generateContent(calculationPrompt);
+      let result: any = null;
+      // Try candidate models
+      for (const candidate of candidateModels) {
+        try {
+          selectedModelInstance = genAI.getGenerativeModel({ model: candidate });
+          console.log('plastic-calculator: attempting model', candidate);
+          result = await selectedModelInstance.generateContent(calculationPrompt);
+          const upstreamStatus = result?.response?.status ?? result?.status;
+          if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+            console.warn('plastic-calculator: model', candidate, 'returned status', upstreamStatus);
+            if (upstreamStatus === 404) continue;
+            continue;
+          }
+          chosenModelName = candidate;
+          console.log('plastic-calculator: model selected', chosenModelName);
+          break;
+        } catch (mErr) {
+          console.warn('plastic-calculator: model', candidate, 'failed:', (mErr as any)?.message || mErr);
+          result = null;
+          continue;
+        }
+      }
+
+      // If none of the candidates worked, try discovering models via ListModels
+      if (!result) {
+        try {
+          const listUrl = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(apiKey || '')}`;
+          const listResp = await fetch(listUrl);
+          if (listResp.ok) {
+            const listJson = await listResp.json();
+            const remoteModels: string[] = (listJson?.models || [])
+              .map((m: any) => String(m?.name || ''))
+              .filter(Boolean)
+              .map((n: string) => n.replace(/^models\//, ''));
+            console.log('plastic-calculator: discovered models from ListModels:', remoteModels.join(', '));
+            for (const remote of remoteModels) {
+              if (candidateModels.includes(remote)) continue;
+              try {
+                selectedModelInstance = genAI.getGenerativeModel({ model: remote });
+                console.log('plastic-calculator: attempting discovered model', remote);
+                const r = await selectedModelInstance.generateContent(calculationPrompt);
+                const upstreamStatus = r?.response?.status ?? r?.status;
+                if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+                  console.warn('plastic-calculator: discovered model', remote, 'returned status', upstreamStatus);
+                  continue;
+                }
+                result = r;
+                chosenModelName = remote;
+                console.log('plastic-calculator: discovered model selected', chosenModelName);
+                break;
+              } catch (dmErr) {
+                console.warn('plastic-calculator: discovered model', remote, 'failed:', (dmErr as any)?.message || dmErr);
+                continue;
+              }
+            }
+          } else {
+            console.warn('plastic-calculator: ListModels request failed with status', listResp.status);
+          }
+        } catch (listErr) {
+          console.warn('plastic-calculator: ListModels error:', (listErr as any)?.message || listErr);
+        }
+      }
+
+      if (!result) {
+        throw new Error('No candidate model produced a usable response');
+      }
+
       const responseText = typeof result?.response?.text === 'function' ? await result.response.text() : String(result);
 
       // Clean the response to ensure it's valid JSON
@@ -218,8 +288,13 @@ Focus on practical steps and measurable outcomes.
 `;
 
       try {
-        const reportResult = await model.generateContent(reportPrompt);
-        reportContent = typeof reportResult?.response?.text === 'function' ? await reportResult.response.text() : String(reportResult);
+        if (!selectedModelInstance && chosenModelName) {
+          selectedModelInstance = genAI.getGenerativeModel({ model: chosenModelName });
+        }
+        if (selectedModelInstance) {
+          const reportResult = await selectedModelInstance.generateContent(reportPrompt);
+          reportContent = typeof reportResult?.response?.text === 'function' ? await reportResult.response.text() : String(reportResult);
+        }
       } catch (reportError) {
         console.error('Report generation error:', (reportError as any)?.message || reportError);
         // Continue without report if generation fails

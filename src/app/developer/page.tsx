@@ -46,25 +46,25 @@ export default function Page() {
     try {
       setLoading(true);
       
-      // Fetch user data with fresh request
-      const userResponse = await fetch('https://api.github.com/users/AkshitTiwarii', {
-        cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache',
-        }
-      });
-      const user = await userResponse.json();
-      setUserData(user);
+      // Fetch user data via our server proxy to avoid client-side rate limits/CORS issues.
+      const userResponse = await fetch('/api/github/user', { cache: 'no-cache' });
+      if (!userResponse.ok) {
+        console.error('GitHub user proxy returned', userResponse.status);
+        setUserData(null);
+      } else {
+        const user = await userResponse.json();
+        setUserData(user);
+      }
 
-      // Fetch repositories with fresh request
-      const reposResponse = await fetch('https://api.github.com/users/AkshitTiwarii/repos?sort=updated&per_page=6', {
-        cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache',
-        }
-      });
-      const reposData = await reposResponse.json();
-      setRepos(reposData);
+      // Fetch repos via server proxy (preserves query options)
+      const reposResponse = await fetch('/api/github/repos?sort=updated&per_page=6', { cache: 'no-cache' });
+      if (!reposResponse.ok) {
+        console.error('GitHub repos proxy returned', reposResponse.status);
+        setRepos([]);
+      } else {
+        const reposData = await reposResponse.json();
+        setRepos(reposData);
+      }
 
       // Generate contribution data for a proper grid (53 weeks × 7 days)
       const contributionData = generateContributionGrid();
