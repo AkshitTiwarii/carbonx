@@ -6,9 +6,9 @@ let genAI: any = null;
 
 export async function POST(request: NextRequest) {
   try {
-    // Initialize Gemini client for this request if possible
+    // Read API key from environment and initialize Gemini client for this request if possible
+    const apiKey = process.env.GEMINI_API_KEY;
     if (genAI === null) {
-      const apiKey = process.env.GEMINI_API_KEY;
       if (apiKey) genAI = new GoogleGenerativeAI(apiKey);
     }
 
@@ -52,8 +52,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-    
+    // candidate models to try (some accounts may not have access to all models)
+    const candidateModels = [
+      'gemini-1.5-flash-latest',
+      'gemini-1.0',
+      'text-bison-001'
+    ];
+  let chosenModelName: string | null = null;
+  let result: any = null;
+  // Keep a reference to the chosen model instance so we can reuse it for report generation
+  let selectedModelInstance: any = null;
+
     const calculationPrompt = `
 You are an expert carbon accountant and sustainability consultant. Analyze this business/project description and provide a comprehensive carbon footprint calculation.
 
@@ -116,27 +125,156 @@ Provide realistic, industry-standard calculations based on current emission fact
 
     let calculation;
     try {
-      const result = await model.generateContent(calculationPrompt);
+      // Helper: fallback to calling the v1 REST generateContent endpoint directly
+      // Some keys/accounts expose models only on the v1 endpoint. If the SDK
+      // (which may call v1beta) returns 404, we'll try the v1 REST path.
+      async function tryV1Generate(apiKey: string | undefined, modelName: string, prompt: string) {
+        if (!apiKey) return null;
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ instances: [{ content: prompt }] })
+          });
+          const txt = await resp.text();
+          return { response: { status: resp.status, text: () => Promise.resolve(txt) }, status: resp.status };
+        } catch (e) {
+          console.warn('ai-calculator: v1 generateContent fetch failed:', (e as any)?.message || e);
+          return null;
+        }
+      }
+
+      // Try candidate models in order until one produces a non-error response
+      for (const candidate of candidateModels) {
+        try {
+          selectedModelInstance = genAI.getGenerativeModel({ model: candidate });
+          console.log('ai-calculator: attempting model', candidate);
+          result = await selectedModelInstance.generateContent(calculationPrompt);
+          const upstreamStatus = result?.response?.status ?? result?.status;
+          if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+            console.warn('ai-calculator: model', candidate, 'returned status', upstreamStatus);
+            if (upstreamStatus === 404) {
+              // Try the v1 REST generateContent endpoint as a fallback for this model
+              const v1res = await tryV1Generate(apiKey, candidate, calculationPrompt);
+              if (v1res && (v1res?.response?.status ?? v1res?.status) < 400) {
+                result = v1res;
+                chosenModelName = candidate;
+                console.log('ai-calculator: v1 generateContent succeeded for', candidate);
+                break;
+              }
+              continue; // try next model
+            }
+            // for other statuses, also try next model
+            continue;
+          }
+          chosenModelName = candidate;
+          console.log('ai-calculator: model selected', chosenModelName);
+          break;
+        } catch (mErr) {
+          console.warn('ai-calculator: model', candidate, 'failed to init or call:', (mErr as any)?.message || mErr);
+          result = null;
+          continue;
+        }
+      }
+
+      if (!result) {
+        // As a last resort, call the provider's ListModels endpoint to discover
+        // what models are available to this API key and try them dynamically.
+        try {
+          const listUrl = `https://generativelanguage.googleapis.com/v1/models?key=${encodeURIComponent(apiKey || '')}`;
+          const listResp = await fetch(listUrl);
+          if (listResp.ok) {
+            const listJson = await listResp.json();
+            const remoteModels: string[] = (listJson?.models || [])
+              .map((m: any) => String(m?.name || ''))
+              .filter(Boolean)
+              .map((n: string) => n.replace(/^models\//, ''));
+            console.log('ai-calculator: discovered models from ListModels:', remoteModels.join(', '));
+
+            for (const remote of remoteModels) {
+              if (candidateModels.includes(remote)) continue; // already tried
+              try {
+                console.log('ai-calculator: attempting discovered model', remote);
+                selectedModelInstance = genAI.getGenerativeModel({ model: remote });
+                const r = await selectedModelInstance.generateContent(calculationPrompt);
+                const upstreamStatus = r?.response?.status ?? r?.status;
+                if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+                  console.warn('ai-calculator: discovered model', remote, 'returned status', upstreamStatus);
+                  if (upstreamStatus === 404) {
+                    // Try v1 REST generateContent for discovered model
+                    const v1res = await tryV1Generate(apiKey, remote, calculationPrompt);
+                    if (v1res && (v1res?.response?.status ?? v1res?.status) < 400) {
+                      result = v1res;
+                      chosenModelName = remote;
+                      console.log('ai-calculator: v1 generateContent succeeded for discovered model', remote);
+                      break;
+                    }
+                  }
+                  continue;
+                }
+                result = r;
+                chosenModelName = remote;
+                console.log('ai-calculator: discovered model selected', chosenModelName);
+                break;
+              } catch (dmErr) {
+                console.warn('ai-calculator: discovered model', remote, 'failed:', (dmErr as any)?.message || dmErr);
+                continue;
+              }
+            }
+          } else {
+            console.warn('ai-calculator: ListModels request failed with status', listResp.status);
+          }
+        } catch (listErr) {
+          console.warn('ai-calculator: ListModels error:', (listErr as any)?.message || listErr);
+        }
+
+        if (!result) {
+          throw new Error('No candidate model produced a usable response');
+        }
+      }
+
+      // Normalize getting the response text from different result shapes
       const responseText = typeof result?.response?.text === 'function'
         ? await result.response.text()
         : String(result);
 
+      // If the upstream service returned an HTTP error status, surface it (no secrets)
+      const upstreamStatus = result?.response?.status ?? result?.status;
+      if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
+        // Log a short snippet of the upstream body for diagnostics (no secrets)
+        console.error('Upstream AI error:', upstreamStatus, responseText?.slice?.(0, 200));
+        return NextResponse.json({
+          success: false,
+          upstreamError: true,
+          upstreamStatus,
+          message: 'Upstream AI service returned an error. See server logs for non-secret details.'
+        }, { status: 502 });
+      }
+
       // Clean the response to ensure it's valid JSON
-      let cleanedResponse = responseText.trim();
+      let cleanedResponse = (responseText || '').trim();
       if (cleanedResponse.startsWith('```json')) {
         cleanedResponse = cleanedResponse.replace(/```json\n?/, '').replace(/\n?```$/, '');
       }
       if (cleanedResponse.startsWith('```')) {
         cleanedResponse = cleanedResponse.replace(/```\n?/, '').replace(/\n?```$/, '');
       }
-      
-      calculation = JSON.parse(cleanedResponse);
+
+      try {
+        calculation = JSON.parse(cleanedResponse);
+      } catch (jsonErr) {
+        // Include a snippet of the response in server logs to help diagnose malformed output
+        console.error('AI response parsing error: invalid JSON. Snippet:', (cleanedResponse || '').slice(0, 1000));
+        throw jsonErr;
+      }
     } catch (parseError: any) {
-      console.error('AI response parsing error:', parseError?.status || parseError?.message || parseError);
-      
-      // Check if it's a rate limit error or model not found error
-      if (parseError?.status === 429 || parseError?.status === 404 || parseError?.message?.includes('RATE_LIMIT_EXCEEDED') || parseError?.message?.includes('not found')) {
-        // Return a helpful fallback response for rate limiting or model errors
+      // If parseError is a structured upstream error, include its status/message in logs
+      console.error('AI response parsing error:', (parseError && (parseError.status || parseError.message)) || parseError);
+
+      // Check for rate limit/model-not-found style errors and return a helpful fallback
+      const msg = String(parseError?.message || parseError || 'Unknown error');
+      if (parseError?.status === 429 || parseError?.status === 404 || msg.includes('RATE_LIMIT_EXCEEDED') || msg.includes('not found')) {
         return NextResponse.json({
           success: true,
           rateLimited: true,
@@ -188,11 +326,9 @@ Provide realistic, industry-standard calculations based on current emission fact
           message: "AI service temporarily unavailable (model access issue or rate limit). Showing sample calculation. Please check your API key configuration or try again later."
         });
       }
-      
-      return NextResponse.json(
-        { success: false, error: 'Failed to parse AI calculation. Please try rephrasing your query.' },
-        { status: 500 }
-      );
+
+      // For all other parse/errors, return a 502 with a non-secret message
+      return NextResponse.json({ success: false, error: 'Upstream AI parsing or service error. Check server logs.' }, { status: 502 });
     }
 
     // Validate required fields
@@ -226,10 +362,16 @@ Include charts/tables using HTML/CSS, professional formatting, and executive-lev
 `;
 
       try {
-        const reportResult = await model.generateContent(reportPrompt);
-        reportContent = reportResult.response.text();
+        // Ensure we have a model instance to generate the report. If not, create one from chosenModelName.
+        if (!selectedModelInstance && chosenModelName) {
+          selectedModelInstance = genAI.getGenerativeModel({ model: chosenModelName });
+        }
+        if (selectedModelInstance) {
+          const reportResult = await selectedModelInstance.generateContent(reportPrompt);
+          reportContent = typeof reportResult?.response?.text === 'function' ? await reportResult.response.text() : String(reportResult);
+        }
       } catch (reportError) {
-        console.error('Report generation error:', reportError);
+        console.error('Report generation error:', (reportError as any)?.message || reportError);
         // Continue without report if generation fails
       }
     }
