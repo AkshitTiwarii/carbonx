@@ -134,7 +134,8 @@ export async function POST(request: NextRequest) {
         genAI = new GoogleGenerativeAI(API_KEY);
         console.log('carbonx-chat: genAI initialized');
       } catch (initErr) {
-        console.error('carbonx-chat: genAI initialization error', initErr?.message || initErr);
+        // initErr may be unknown - cast to any for safe message access
+        console.error('carbonx-chat: genAI initialization error', (initErr as any)?.message || initErr);
       }
     }
 
@@ -173,11 +174,12 @@ Please provide a helpful response:
 `;
 
       const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      const responseText = typeof result?.response?.text === 'function'
+        ? await result.response.text()
+        : String(result);
 
       return NextResponse.json({ 
-        response: text,
+        response: responseText,
         mode: 'ai'
       });
 

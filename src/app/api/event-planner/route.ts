@@ -117,11 +117,12 @@ Provide practical, actionable recommendations that are specific to the event typ
 
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
       const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      const responseText = typeof result?.response?.text === 'function'
+        ? await result.response.text()
+        : String(result);
 
       // Extract JSON from the response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('No valid JSON found in AI response');
       }

@@ -117,8 +117,10 @@ Provide realistic, industry-standard calculations based on current emission fact
     let calculation;
     try {
       const result = await model.generateContent(calculationPrompt);
-      const responseText = result.response.text();
-      
+      const responseText = typeof result?.response?.text === 'function'
+        ? await result.response.text()
+        : String(result);
+
       // Clean the response to ensure it's valid JSON
       let cleanedResponse = responseText.trim();
       if (cleanedResponse.startsWith('```json')) {
