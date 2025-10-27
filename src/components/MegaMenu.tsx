@@ -57,12 +57,12 @@ export default function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-4 md:p-6">
           {/* Left: feature tiles */}
           <div className="md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <FeatureTile title="Marketplace" text="Browse verified carbon credits" color="from-orange-500 to-red-500" href="/marketplace" badge="HOT"/>
-            <FeatureTile title="Trading" text="Trade carbon credits" color="from-indigo-500 to-blue-600" href="/trading" badge="NEW"/>
-            <FeatureTile title="Portfolio" text="Track crypto assets" color="from-violet-500 to-purple-600" href="/portfolio" badge="NEW"/>
-            <FeatureTile title="Toucan Protocol" text="Real blockchain carbon credits" color="from-emerald-500 to-teal-600" href="/toucan-demo" badge="NEW"/>
-            <FeatureTile title="AI Calculator" text="AI-powered carbon credits" color="from-green-500 to-emerald-600" href="/ai-calculator" badge="AI"/>
-            <FeatureTile title="Event Planner" text="Plan sustainable events" color="from-emerald-500 to-green-600" href="/event-planner" badge="NEW"/>
+            <FeatureTile title="Marketplace" text="Browse verified carbon credits" color="from-orange-500 to-red-500" href="/marketplace" badge="HOT" onClick={onClose} />
+            <FeatureTile title="Trading" text="Trade carbon credits" color="from-indigo-500 to-blue-600" href="/trading" badge="NEW" onClick={onClose} />
+            <FeatureTile title="Portfolio" text="Track crypto assets" color="from-violet-500 to-purple-600" href="/portfolio" badge="NEW" onClick={onClose} />
+            <FeatureTile title="Toucan Protocol" text="Real blockchain carbon credits" color="from-emerald-500 to-teal-600" href="/toucan-demo" badge="NEW" onClick={onClose} />
+            <FeatureTile title="AI Calculator" text="AI-powered carbon credits" color="from-green-500 to-emerald-600" href="/ai-calculator" badge="AI" onClick={onClose} />
+            <FeatureTile title="Event Planner" text="Plan sustainable events" color="from-emerald-500 to-green-600" href="/event-planner" badge="NEW" onClick={onClose} />
           </div>
 
           {/* Right: explore more */}
@@ -104,9 +104,9 @@ export default function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
   );
 }
 
-function FeatureTile({ title, text, color, href, badge }: { title: string; text: string; color: string; href: string; badge?: string; }) {
+function FeatureTile({ title, text, color, href, badge, onClick }: { title: string; text: string; color: string; href: string; badge?: string; onClick?: () => void }) {
   return (
-    <Link href={href} className={`group relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-br ${color} text-white p-5 min-h-[140px] flex items-end`}>
+    <Link href={href} onClick={onClick} className={`group relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-br ${color} text-white p-5 min-h-[140px] flex items-end`}>
       <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_20%,white,transparent_40%)]" />
       <div className="relative">
         <div className="text-2xl font-bold drop-shadow-sm">{title}</div>
