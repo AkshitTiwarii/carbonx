@@ -1,0 +1,23 @@
+name: Auto Comment on New Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add a comment to new issues
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            👋 Thanks for opening this issue!
+
+            Please make sure you've:
+            - Described the problem clearly  
+            - Provided screenshots or logs (if relevant)  
+            - Mentioned the expected behavior
+
+            A maintainer will review this soon. Stay tuned!
