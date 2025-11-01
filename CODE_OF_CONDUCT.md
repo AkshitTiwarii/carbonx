@@ -46,7 +46,7 @@ If you witness or experience unacceptable behaviour:
    - If relevant, any supporting evidence (screenshots, links to discussion).  
 3. The maintainers will review your report, keep it confidential, and respond in a timely manner.
 
-If the maintainers are unavailable or you feel uncomfortable contacting them directly, you may escalate via [insert backup contact or method here].  
+If the maintainers are unavailable or you feel uncomfortable contacting them directly, you may escalate by emailing conduct@carbonx.org (monitored by a neutral third party).  
 
 ## 7. Attribution  
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1, with modifications to fit the CarbonX community.
