@@ -1,0 +1,19 @@
+name: Semgrep
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
+      - name: Upload results to GitHub code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
