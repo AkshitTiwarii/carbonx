@@ -15,6 +15,6 @@ jobs:
           config: auto
       - name: Upload results to GitHub code scanning
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.27.9
         with:
           sarif_file: semgrep.sarif
