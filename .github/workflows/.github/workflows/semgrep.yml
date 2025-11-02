@@ -13,6 +13,7 @@ jobs:
         uses: returntocorp/semgrep-action@v1.95.0
         with:
           config: auto
+          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
       - name: Upload results to GitHub code scanning
         if: always()
         uses: github/codeql-action/upload-sarif@v3.27.9
