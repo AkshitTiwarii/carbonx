@@ -222,10 +222,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## ✨ Contributors
+
+
+#### Thanks to all the wonderful contributors 💖
+
+<a href="https://github.com/AkshitTiwarii/carbonx/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=AkshitTiwarii/carbonx" />
+</a>
+
+
+#### See full list of contributor contribution [Contribution Graph](https://github.com/AkshitTiwarii/carbonx/graphs/contributors)  
 <div align="center">
+
+---
 
 **🌱 Building a sustainable future with AI and blockchain technology**
 
 [⭐ Star this repository](https://github.com/AkshitTiwarii/carbonx) if you find it helpful!
 
 </div>
+
