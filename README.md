@@ -95,7 +95,7 @@ npm run dev
 ```
 
 5. **Open your browser**
-Navigate to `http://localhost:3002` to see the application.
+Navigate to `http://localhost:3000` to see the application.
 
 ## 📱 Application Structure
 
