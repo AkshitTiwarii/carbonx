@@ -2,6 +2,9 @@
 # Reference: https://github.com/marketplace/actions/copy-issue-labels
 
 name: Copy Issue Labels to PR
+permissions:
+  issues: write
+  pull-requests: write
 
 on: 
   pull_request:
