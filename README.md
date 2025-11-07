@@ -9,7 +9,7 @@
 
 ## 🚀 Live Demo
 
-**🔗 [Visit CarbonX Platform](http://localhost:3002)** *(Running locally)*
+**🔗 [Visit CarbonX Platform](http://localhost:3000)** *(Running locally)*
 
 ## ✨ Features
 
@@ -86,7 +86,7 @@ Add your API keys to `.env.local`:
 ```env
 GEMINI_API_KEY=your_google_ai_api_key_here
 THIRDWEB_API_KEY=your_thirdweb_api_key_here
-NEXTAUTH_URL=http://localhost:3002
+NEXTAUTH_URL=http://localhost:3000
 ```
 
 4. **Start the development server**
