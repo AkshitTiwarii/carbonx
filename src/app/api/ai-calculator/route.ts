@@ -12,14 +12,6 @@ export async function POST(request: NextRequest) {
       if (apiKey) genAI = new GoogleGenerativeAI(apiKey);
     }
 
-    // Debugging: log boolean presence of key and whether client was initialized
-    try {
-      console.log('ai-calculator: GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
-      console.log('ai-calculator: genAI initialized?', !!genAI);
-    } catch (e) {
-      // swallow logging errors
-    }
-
     const { query, generateReport } = await request.json();
     
     if (!query) {
@@ -140,7 +132,6 @@ Provide realistic, industry-standard calculations based on current emission fact
           const txt = await resp.text();
           return { response: { status: resp.status, text: () => Promise.resolve(txt) }, status: resp.status };
         } catch (e) {
-          console.warn('ai-calculator: v1 generateContent fetch failed:', (e as any)?.message || e);
           return null;
         }
       }
@@ -149,18 +140,15 @@ Provide realistic, industry-standard calculations based on current emission fact
       for (const candidate of candidateModels) {
         try {
           selectedModelInstance = genAI.getGenerativeModel({ model: candidate });
-          console.log('ai-calculator: attempting model', candidate);
           result = await selectedModelInstance.generateContent(calculationPrompt);
           const upstreamStatus = result?.response?.status ?? result?.status;
           if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
-            console.warn('ai-calculator: model', candidate, 'returned status', upstreamStatus);
             if (upstreamStatus === 404) {
               // Try the v1 REST generateContent endpoint as a fallback for this model
               const v1res = await tryV1Generate(apiKey, candidate, calculationPrompt);
               if (v1res && (v1res?.response?.status ?? v1res?.status) < 400) {
                 result = v1res;
                 chosenModelName = candidate;
-                console.log('ai-calculator: v1 generateContent succeeded for', candidate);
                 break;
               }
               continue; // try next model
@@ -169,10 +157,8 @@ Provide realistic, industry-standard calculations based on current emission fact
             continue;
           }
           chosenModelName = candidate;
-          console.log('ai-calculator: model selected', chosenModelName);
           break;
         } catch (mErr) {
-          console.warn('ai-calculator: model', candidate, 'failed to init or call:', (mErr as any)?.message || mErr);
           result = null;
           continue;
         }
@@ -190,24 +176,20 @@ Provide realistic, industry-standard calculations based on current emission fact
               .map((m: any) => String(m?.name || ''))
               .filter(Boolean)
               .map((n: string) => n.replace(/^models\//, ''));
-            console.log('ai-calculator: discovered models from ListModels:', remoteModels.join(', '));
 
             for (const remote of remoteModels) {
-              if (candidateModels.includes(remote)) continue; // already tried
+              if (candidateModels.includes(remote)) continue;
               try {
-                console.log('ai-calculator: attempting discovered model', remote);
                 selectedModelInstance = genAI.getGenerativeModel({ model: remote });
                 const r = await selectedModelInstance.generateContent(calculationPrompt);
                 const upstreamStatus = r?.response?.status ?? r?.status;
                 if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
-                  console.warn('ai-calculator: discovered model', remote, 'returned status', upstreamStatus);
                   if (upstreamStatus === 404) {
                     // Try v1 REST generateContent for discovered model
                     const v1res = await tryV1Generate(apiKey, remote, calculationPrompt);
                     if (v1res && (v1res?.response?.status ?? v1res?.status) < 400) {
                       result = v1res;
                       chosenModelName = remote;
-                      console.log('ai-calculator: v1 generateContent succeeded for discovered model', remote);
                       break;
                     }
                   }
@@ -215,18 +197,14 @@ Provide realistic, industry-standard calculations based on current emission fact
                 }
                 result = r;
                 chosenModelName = remote;
-                console.log('ai-calculator: discovered model selected', chosenModelName);
                 break;
               } catch (dmErr) {
-                console.warn('ai-calculator: discovered model', remote, 'failed:', (dmErr as any)?.message || dmErr);
                 continue;
               }
             }
           } else {
-            console.warn('ai-calculator: ListModels request failed with status', listResp.status);
           }
         } catch (listErr) {
-          console.warn('ai-calculator: ListModels error:', (listErr as any)?.message || listErr);
         }
 
         if (!result) {
@@ -242,8 +220,6 @@ Provide realistic, industry-standard calculations based on current emission fact
       // If the upstream service returned an HTTP error status, surface it (no secrets)
       const upstreamStatus = result?.response?.status ?? result?.status;
       if (typeof upstreamStatus === 'number' && upstreamStatus >= 400) {
-        // Log a short snippet of the upstream body for diagnostics (no secrets)
-        console.error('Upstream AI error:', upstreamStatus, responseText?.slice?.(0, 200));
         return NextResponse.json({
           success: false,
           upstreamError: true,
@@ -264,15 +240,9 @@ Provide realistic, industry-standard calculations based on current emission fact
       try {
         calculation = JSON.parse(cleanedResponse);
       } catch (jsonErr) {
-        // Include a snippet of the response in server logs to help diagnose malformed output
-        console.error('AI response parsing error: invalid JSON. Snippet:', (cleanedResponse || '').slice(0, 1000));
         throw jsonErr;
       }
     } catch (parseError: any) {
-      // If parseError is a structured upstream error, include its status/message in logs
-      console.error('AI response parsing error:', (parseError && (parseError.status || parseError.message)) || parseError);
-
-      // Check for rate limit/model-not-found style errors and return a helpful fallback
       const msg = String(parseError?.message || parseError || 'Unknown error');
       if (parseError?.status === 429 || parseError?.status === 404 || msg.includes('RATE_LIMIT_EXCEEDED') || msg.includes('not found')) {
         return NextResponse.json({
@@ -371,7 +341,6 @@ Include charts/tables using HTML/CSS, professional formatting, and executive-lev
           reportContent = typeof reportResult?.response?.text === 'function' ? await reportResult.response.text() : String(reportResult);
         }
       } catch (reportError) {
-        console.error('Report generation error:', (reportError as any)?.message || reportError);
         // Continue without report if generation fails
       }
     }
@@ -387,7 +356,6 @@ Include charts/tables using HTML/CSS, professional formatting, and executive-lev
     });
     
   } catch (error) {
-    console.error('AI Calculator error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
