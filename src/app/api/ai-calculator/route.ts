@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { trackCalculatorUsage } from '../../lib/autoRewards';
 
 // Don't initialize the client at module load time; initialize per-request to avoid build-time failures
 let genAI: any = null;
@@ -20,7 +21,8 @@ export async function POST(request: NextRequest) {
       // swallow logging errors
     }
 
-    const { query, generateReport } = await request.json();
+    const body = await request.json();
+    const { query, generateReport } = body;
     
     if (!query) {
       return NextResponse.json(
