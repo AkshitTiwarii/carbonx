@@ -118,7 +118,7 @@ export default function AIToolsDropdown({ isOpen, onClose, triggerRef }: AITools
   return (
     <div
       ref={dropdownRef}
-      className="absolute top-full left-0 mt-2 w-96 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden"
+      className="absolute top-full left-0 mt-2 w-96 max-h-96 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col"
     >
       {/* Header */}
       <div className="p-4 border-b border-zinc-800 bg-gradient-to-r from-purple-500/10 to-cyan-500/10">
@@ -126,83 +126,86 @@ export default function AIToolsDropdown({ isOpen, onClose, triggerRef }: AITools
         <p className="text-sm text-zinc-400">Intelligent solutions for sustainability management</p>
       </div>
 
-      {/* Available Tools */}
-      <div className="p-2">
-        <div className="mb-3">
-          <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Available Now</h4>
-        </div>
-        {availableTools.map((tool) => (
-          <Link
-            key={tool.id}
-            href={tool.href}
-            onClick={onClose}
-            className="block p-3 rounded-lg hover:bg-zinc-800/60 transition-colors group"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 p-2 bg-zinc-800/50 rounded-lg group-hover:bg-zinc-700/60 transition-colors">
-                {tool.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h5 className="font-medium text-zinc-100 group-hover:text-white transition-colors">
-                    {tool.name}
-                  </h5>
-                  {tool.badge && (
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
-                      {tool.badge}
-                    </span>
-                  )}
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto scroll-smooth">
+        {/* Available Tools */}
+        <div className="p-2">
+          <div className="mb-3">
+            <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Available Now</h4>
+          </div>
+          {availableTools.map((tool) => (
+            <Link
+              key={tool.id}
+              href={tool.href}
+              onClick={onClose}
+              className="block p-3 rounded-lg hover:bg-zinc-800/60 transition-colors group"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 p-2 bg-zinc-800/50 rounded-lg group-hover:bg-zinc-700/60 transition-colors">
+                  {tool.icon}
                 </div>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  {tool.description}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h5 className="font-medium text-zinc-100 group-hover:text-white transition-colors">
+                      {tool.name}
+                    </h5>
+                    {tool.badge && (
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
+                        {tool.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    {tool.description}
+                  </p>
+                </div>
               </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Coming Soon Tools */}
+        {comingSoonTools.length > 0 && (
+          <>
+            <div className="border-t border-zinc-800"></div>
+            <div className="p-2">
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Coming Soon</h4>
+              </div>
+              {comingSoonTools.map((tool) => (
+                <div
+                  key={tool.id}
+                  className="block p-3 rounded-lg opacity-60 cursor-not-allowed"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 p-2 bg-zinc-800/30 rounded-lg">
+                      {tool.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h5 className="font-medium text-zinc-300">
+                          {tool.name}
+                        </h5>
+                        {tool.badge && (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
+                            {tool.badge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-zinc-500 leading-relaxed">
+                        {tool.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </Link>
-        ))}
+          </>
+        )}
       </div>
 
-      {/* Coming Soon Tools */}
-      {comingSoonTools.length > 0 && (
-        <>
-          <div className="border-t border-zinc-800"></div>
-          <div className="p-2">
-            <div className="mb-3">
-              <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Coming Soon</h4>
-            </div>
-            {comingSoonTools.map((tool) => (
-              <div
-                key={tool.id}
-                className="block p-3 rounded-lg opacity-60 cursor-not-allowed"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 p-2 bg-zinc-800/30 rounded-lg">
-                    {tool.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h5 className="font-medium text-zinc-300">
-                        {tool.name}
-                      </h5>
-                      {tool.badge && (
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
-                          {tool.badge}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-zinc-500 leading-relaxed">
-                      {tool.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
       {/* Footer */}
-      <div className="border-t border-zinc-800 p-4 bg-zinc-900/50">
+      <div className="border-t border-zinc-800 p-4 bg-zinc-900/50 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-zinc-400">More tools coming soon</p>
