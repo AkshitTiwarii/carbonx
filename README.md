@@ -179,7 +179,9 @@ CarbonX is committed to sustainability:
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Here's how you can help:
+We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
+
+### Quick Start for Contributors
 
 1. **Fork the repository**
 2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
@@ -187,15 +189,20 @@ We welcome contributions from the community! Here's how you can help:
 4. **Push to the branch** (`git push origin feature/amazing-feature`)
 5. **Open a Pull Request**
 
+For detailed contribution guidelines, code standards, and best practices, please read our [**Contributing Guide**](CONTRIBUTING.md).
+
 ### Development Guidelines
 - Follow TypeScript best practices
 - Use Tailwind CSS for styling
 - Write tests for new features
 - Update documentation as needed
+- Create an issue before working on major features
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE.md](LICENSE.md) file for full details.
+
+You are free to use, modify, and distribute this project in accordance with the license terms.
 
 ## 👨‍💻 Developer
 
