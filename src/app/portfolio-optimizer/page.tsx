@@ -69,7 +69,7 @@ export default function PortfolioOptimizerPage() {
           </div>
           
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-            <Calendar className="w-10 h-10 text-pink-400 mb-4" />
+            <Calendar className="w-10 h-10 text-indigo-400 mb-4" />
             <h3 className="text-lg font-semibold text-zinc-100 mb-3">Automated Rebalancing</h3>
             <p className="text-zinc-400">Smart scheduling and execution of portfolio adjustments</p>
           </div>

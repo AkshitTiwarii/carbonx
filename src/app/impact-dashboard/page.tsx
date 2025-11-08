@@ -116,7 +116,7 @@ export default function ImpactDashboardPage() {
           </div>
           
           <div className="text-center">
-            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-gradient-to-r from-purple-500/20 to-violet-500/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl font-bold text-purple-400">📊</span>
             </div>
             <h3 className="font-semibold text-zinc-100 mb-2">ESG Scores</h3>

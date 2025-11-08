@@ -376,14 +376,22 @@ Include charts/tables using HTML/CSS, professional formatting, and executive-lev
       }
     }
 
+    const responseData = {
+      ...calculation,
+      query,
+      timestamp: new Date().toISOString(),
+      reportContent
+    };
+
+    // Auto-track rewards if user_id is provided
+    const userId = (body as any).user_id;
+    if (userId) {
+      trackCalculatorUsage(userId, "ai_carbon", 1, (body as any).location).catch(console.error);
+    }
+
     return NextResponse.json({
       success: true,
-      data: {
-        ...calculation,
-        query,
-        timestamp: new Date().toISOString(),
-        reportContent
-      }
+      data: responseData
     });
     
   } catch (error) {

@@ -18,19 +18,19 @@
 
 @layer base {
 	body {
-		@apply bg-rose-50 text-zinc-900;
-		/* soft pink ambience for light mode */
+		@apply bg-black text-zinc-100;
+		/* dark black with blue and green accents */
 		background-image:
-			radial-gradient(900px 600px at 20% -10%, rgba(244,114,182,0.18), transparent 60%), /* pink-400 */
-			radial-gradient(700px 500px at 80% -20%, rgba(251,113,133,0.12), transparent 60%), /* rose-400 */
-			radial-gradient(800px 520px at 50% 120%, rgba(196,181,253,0.10), transparent 60%); /* violet-300 */
+			radial-gradient(900px 600px at 20% -10%, rgba(59,130,246,0.12), transparent 60%), /* blue-500 */
+			radial-gradient(700px 500px at 80% -20%, rgba(34,197,94,0.10), transparent 60%), /* green-500 */
+			radial-gradient(800px 520px at 50% 120%, rgba(37,99,235,0.08), transparent 60%); /* blue-600 */
 	}
 	.dark body {
-		@apply bg-zinc-950 text-zinc-100;
+		@apply bg-black text-zinc-100;
 		background-image:
-			radial-gradient(900px 600px at 20% -10%, rgba(79,70,229,0.15), transparent 60%),
-			radial-gradient(700px 500px at 80% -20%, rgba(168,85,247,0.12), transparent 60%),
-			radial-gradient(800px 520px at 50% 120%, rgba(14,165,233,0.12), transparent 60%);
+			radial-gradient(900px 600px at 20% -10%, rgba(59,130,246,0.15), transparent 60%),
+			radial-gradient(700px 500px at 80% -20%, rgba(34,197,94,0.12), transparent 60%),
+			radial-gradient(800px 520px at 50% 120%, rgba(37,99,235,0.10), transparent 60%);
 	}
 }
 
@@ -66,12 +66,12 @@ html {
 
 @layer components {
 	.btn-primary {
-		@apply relative inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold text-white bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 shadow-[0_10px_30px_-12px_rgba(99,102,241,0.35)] hover:shadow-[0_20px_40px_-12px_rgba(168,85,247,0.45)] transition;
+		@apply relative inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold text-white bg-gradient-to-r from-blue-600 via-blue-500 to-green-500 shadow-[0_10px_30px_-12px_rgba(59,130,246,0.35)] hover:shadow-[0_20px_40px_-12px_rgba(34,197,94,0.45)] transition;
 	}
 	.btn-secondary {
-		@apply relative inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold text-zinc-900 border border-zinc-300 bg-white hover:bg-zinc-50 transition dark:text-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800;
+		@apply relative inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold text-zinc-100 border border-zinc-700 bg-zinc-900/50 hover:bg-zinc-800 transition;
 	}
 	.card {
-		@apply rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900;
+		@apply rounded-2xl border border-zinc-800 bg-zinc-900/50;
 	}
 }

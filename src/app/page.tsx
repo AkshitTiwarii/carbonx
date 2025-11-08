@@ -25,7 +25,7 @@ export default function Home() {
   }, []);
   
   return (
-    <div className="relative overflow-hidden bg-zinc-950">
+    <div className="relative overflow-hidden bg-black">
       <CursorMascot />
       <AmbientBackground />
 
@@ -93,11 +93,55 @@ export default function Home() {
         </Reveal>
       </section>
 
+      {/* Gamification Section */}
+      <section id="gamification" className="relative z-10 mx-auto max-w-7xl px-4 py-12 md:py-16">
+        <Reveal className="text-center mb-10">
+          <div className="inline-flex items-center gap-3 rounded-full border border-blue-500/30 bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-green-500/10 backdrop-blur-sm px-6 py-2.5 text-blue-300 text-sm font-medium mb-4 shadow-lg shadow-blue-500/20">
+            <span className="text-lg">🏆</span>
+            <span>Gamified Rewards</span>
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-blue-500 to-green-400 bg-clip-text text-transparent">Earn rewards for sustainability</h2>
+          <p className="text-zinc-400 mt-3">Track your impact, unlock badges, and compete on leaderboards with every eco-friendly action.</p>
+        </Reveal>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="relative overflow-hidden rounded-2xl border border-blue-500/20 bg-zinc-900/50 backdrop-blur-sm p-6">
+            <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-blue-500/10 blur-2xl" />
+            <div className="relative z-10">
+              <div className="text-4xl mb-3">🏆</div>
+              <h3 className="text-xl font-semibold mb-2 text-zinc-100">EcoPoints System</h3>
+              <p className="text-zinc-400 text-sm">Earn points for every sustainable action—carbon offsets, energy savings, and more.</p>
+            </div>
+          </div>
+          <div className="relative overflow-hidden rounded-2xl border border-green-500/20 bg-zinc-900/50 backdrop-blur-sm p-6">
+            <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-green-500/10 blur-2xl" />
+            <div className="relative z-10">
+              <div className="text-4xl mb-3">🎖️</div>
+              <h3 className="text-xl font-semibold mb-2 text-zinc-100">Achievement Badges</h3>
+              <p className="text-zinc-400 text-sm">Unlock rare badges as you reach milestones and make a real environmental impact.</p>
+            </div>
+          </div>
+          <div className="relative overflow-hidden rounded-2xl border border-blue-500/20 bg-zinc-900/50 backdrop-blur-sm p-6">
+            <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-blue-500/10 blur-2xl" />
+            <div className="relative z-10">
+              <div className="text-4xl mb-3">📊</div>
+              <h3 className="text-xl font-semibold mb-2 text-zinc-100">Global Leaderboards</h3>
+              <p className="text-zinc-400 text-sm">Compete globally and regionally to see how your impact stacks up against others.</p>
+            </div>
+          </div>
+        </div>
+
+        <Reveal delay={100} className="text-center">
+          <CTA href="/rewards-test" label="Start Earning Rewards" />
+        </Reveal>
+      </section>
+
       {/* Features */}
     <section id="features" className="relative z-10 mx-auto max-w-7xl px-4 py-12 md:py-16">
         <Reveal className="text-center mb-10">
-  <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100">Built for a climate-positive economy</h2>
-      <p className="text-zinc-600 dark:text-zinc-400 mt-3">High-utility features that make carbon markets usable and trustworthy.</p>
+  <h2 className="text-3xl md:text-5xl font-bold text-white">Built for a climate-positive economy</h2>
+      <p className="text-zinc-400 mt-3">High-utility features that make carbon markets usable and trustworthy.</p>
         </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -164,10 +208,10 @@ export default function Home() {
 
       {/* CTA */}
       <section className="relative z-10 mx-auto max-w-7xl px-4 py-14">
-        <div className="relative overflow-hidden rounded-3xl border border-emerald-300/40 bg-gradient-to-br from-emerald-100 via-white to-cyan-100 p-10 text-center">
-          <div className="absolute -inset-24 -z-10 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.25),transparent_60%)]" />
-          <h3 className="text-2xl md:text-3xl font-bold text-zinc-900">Ready to build a climate-positive portfolio?</h3>
-          <p className="text-zinc-700 mt-2">Connect your wallet and start trading credits in minutes.</p>
+        <div className="relative overflow-hidden rounded-3xl border border-indigo-300/40 dark:border-indigo-700/40 bg-gradient-to-br from-indigo-50 via-white to-violet-50 dark:from-indigo-950/20 dark:via-zinc-900 dark:to-violet-950/20 p-10 text-center">
+          <div className="absolute -inset-24 -z-10 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_60%)]" />
+          <h3 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100">Ready to build a climate-positive portfolio?</h3>
+          <p className="text-zinc-700 dark:text-zinc-300 mt-2">Connect your wallet and start trading credits in minutes.</p>
           <div className="mt-6 flex justify-center">
             <CTA href="/dashboard" label="Launch App" />
           </div>
@@ -180,9 +224,9 @@ export default function Home() {
 function AmbientBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 -z-10">
-      <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-gradient-to-tr from-rose-400/20 to-pink-300/10 blur-3xl animate-pulse" />
-      <div className="absolute -bottom-24 -right-16 h-[28rem] w-[28rem] rounded-full bg-gradient-to-tr from-rose-300/16 to-violet-300/10 blur-3xl animate-pulse [animation-delay:200ms]" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-gradient-to-tr from-pink-300/14 to-violet-300/8 blur-3xl animate-pulse [animation-delay:400ms]" />
+      <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-gradient-to-tr from-blue-500/20 to-blue-400/10 blur-3xl animate-pulse" />
+      <div className="absolute -bottom-24 -right-16 h-[28rem] w-[28rem] rounded-full bg-gradient-to-tr from-green-500/16 to-blue-400/10 blur-3xl animate-pulse [animation-delay:200ms]" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-gradient-to-tr from-blue-400/14 to-green-400/8 blur-3xl animate-pulse [animation-delay:400ms]" />
     </div>
   );
 }
@@ -219,7 +263,7 @@ function FeatureCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-br from-indigo-200 via-fuchsia-200 to-pink-100">
+    <div className="relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-br from-indigo-200 via-violet-200 to-cyan-100">
       <div className="relative rounded-2xl bg-white border border-zinc-200 p-6 dark:bg-zinc-900 dark:border-zinc-800">
         <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-300/20 blur-2xl" />
         <div className="mb-3 text-indigo-600 dark:text-indigo-300">{icon}</div>

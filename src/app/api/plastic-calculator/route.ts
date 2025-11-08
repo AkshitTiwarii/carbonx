@@ -1,5 +1,6 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { trackCalculatorUsage } from '@/lib/autoRewards';
 
 // Per-request lazy initialization to avoid build-time failures when env is missing
 let genAI: any = null;
@@ -301,14 +302,23 @@ Focus on practical steps and measurable outcomes.
       }
     }
 
+    const responseData = {
+      ...calculation,
+      query,
+      timestamp: new Date().toISOString(),
+      reportContent
+    };
+
+    // Auto-track rewards if user_id is provided
+    const userId = (body as any).user_id;
+    if (userId && calculation?.plasticFootprint?.totalAnnualPlastic) {
+      const plasticReduced = calculation.plasticFootprint.totalAnnualPlastic;
+      trackCalculatorUsage(userId, "plastic", plasticReduced, (body as any).location).catch(console.error);
+    }
+
     return NextResponse.json({
       success: true,
-      data: {
-        ...calculation,
-        query,
-        timestamp: new Date().toISOString(),
-        reportContent
-      }
+      data: responseData
     });
   } catch (error) {
     console.error('Plastic Calculator error:', (error as any)?.status || (error as any)?.message || error);

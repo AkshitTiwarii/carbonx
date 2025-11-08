@@ -22,7 +22,7 @@ export default function Signup() {
   }
 
   return (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-rose-50 dark:bg-zinc-950">
+  <div className="min-h-screen flex flex-col items-center justify-center bg-black">
       <form onSubmit={onSubmit} className="bg-white p-8 rounded-2xl border border-zinc-200 shadow-sm w-80 flex flex-col gap-4 dark:bg-zinc-900 dark:border-zinc-800">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Sign Up</h1>
         <input value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Name" className="border p-2 rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100" required />

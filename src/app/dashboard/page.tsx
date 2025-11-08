@@ -27,7 +27,7 @@ export default function Dashboard() {
             Your one-stop platform for carbon credit trading, portfolio management, and sustainable investing. 
             Get started by connecting your MetaMask wallet and exploring our features.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link 
               href="/features" 
               className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg p-4 transition-all"
@@ -41,6 +41,13 @@ export default function Dashboard() {
             >
               <h3 className="text-zinc-100 font-semibold mb-2">Toucan Protocol Demo</h3>
               <p className="text-zinc-400 text-sm">Experience advanced carbon credit trading</p>
+            </Link>
+            <Link 
+              href="/rewards-test" 
+              className="bg-emerald-800 hover:bg-emerald-700 border border-emerald-700 rounded-lg p-4 transition-all"
+            >
+              <h3 className="text-zinc-100 font-semibold mb-2">🌱 Test Gamification</h3>
+              <p className="text-zinc-400 text-sm">Test the rewards system and track your EcoPoints</p>
             </Link>
           </div>
         </div>
