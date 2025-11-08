@@ -88,7 +88,7 @@ export default function NavBar() {
 
 			{/* Mobile Menu */}
 			{mobileMenuOpen && (
-				<div className="lg:hidden border-t border-zinc-800 bg-zinc-950/95 backdrop-blur">
+				<div className="lg:hidden border-t border-zinc-800 bg-zinc-950/95 backdrop-blur max-h-[70vh] overflow-y-auto ai-tools-scroll">
 					<div className="px-4 py-4 space-y-2">
 						<button 
 							onClick={() => { setOpen(true); setMobileMenuOpen(false); }}
