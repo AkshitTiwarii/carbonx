@@ -115,6 +115,13 @@ export default function NavBar() {
 								♻️ AI Plastic Calculator
 							</Link>
 							<Link 
+								href="/water-calculator" 
+								onClick={() => setMobileMenuOpen(false)}
+								className="block px-3 py-2 ml-3 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"
+							>
+								💧 Water Footprint Calculator
+							</Link>
+							<Link 
 								href="/event-planner" 
 								onClick={() => setMobileMenuOpen(false)}
 								className="block px-3 py-2 ml-3 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"

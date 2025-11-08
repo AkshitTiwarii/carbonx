@@ -77,6 +77,7 @@ export default function MegaMenu({ isOpen, onClose }: MegaMenuProps) {
                 <li><Link onClick={onClose} href="/toucan-demo" className="text-zinc-200 hover:underline">🌿 Toucan Protocol</Link></li>
                 <li><Link onClick={onClose} href="/ai-calculator" className="text-zinc-200 hover:underline">🤖 AI Carbon Calculator</Link></li>
                 <li><Link onClick={onClose} href="/plastic-calculator" className="text-zinc-200 hover:underline">♻️ Plastic Calculator</Link></li>
+                <li><Link onClick={onClose} href="/water-calculator" className="text-zinc-200 hover:underline">💧 Water Footprint Calculator</Link></li>
                 <li><Link onClick={onClose} href="/event-planner" className="text-zinc-200 hover:underline">📅 Event Planner</Link></li>
                 <li><Link onClick={onClose} href="/sustainable-alternatives" className="text-zinc-200 hover:underline">🌱 Sustainable Alternatives</Link></li>
                 <li><Link onClick={onClose} href="/features" className="text-zinc-200 hover:underline">⭐ All Features</Link></li>
