@@ -24,10 +24,7 @@ export default function BadgeCollection({ earnedBadges, allBadges }: BadgeCollec
   useEffect(() => {
     if (allBadges) {
       // Combine earned and unearned badges
-      const allBadgesList = Object.entries(allBadges).map(([id, badge]) => ({
-        id,
-        ...badge,
-      }));
+      const allBadgesList = Object.entries(allBadges).map(([, badge]) => badge);
       setBadges(allBadgesList);
     } else {
       setBadges(earnedBadges);
