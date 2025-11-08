@@ -60,6 +60,27 @@ html {
 	animation: progress 5s linear infinite;
 }
 
+/* Custom scrollbar for AI Tools dropdown */
+.ai-tools-scroll::-webkit-scrollbar {
+	width: 6px;
+}
+.ai-tools-scroll::-webkit-scrollbar-track {
+	background: transparent;
+}
+.ai-tools-scroll::-webkit-scrollbar-thumb {
+	background: #3f3f46;
+	border-radius: 3px;
+}
+.ai-tools-scroll::-webkit-scrollbar-thumb:hover {
+	background: #52525b;
+}
+.dark .ai-tools-scroll::-webkit-scrollbar-thumb {
+	background: #52525b;
+}
+.dark .ai-tools-scroll::-webkit-scrollbar-thumb:hover {
+	background: #71717a;
+}
+
 /* Fallbacks (progressive enhancement) if Tailwind utilities fail to load */
 .nav-links a + a { margin-left: 1.5rem; }
 .btn-row > * + * { margin-left: 0.75rem; }

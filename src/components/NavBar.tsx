@@ -88,7 +88,7 @@ export default function NavBar() {
 
 			{/* Mobile Menu */}
 			{mobileMenuOpen && (
-				<div className="lg:hidden border-t border-zinc-800 bg-zinc-950/95 backdrop-blur">
+				<div className="lg:hidden border-t border-zinc-800 bg-zinc-950/95 backdrop-blur max-h-[70vh] overflow-y-auto ai-tools-scroll">
 					<div className="px-4 py-4 space-y-2">
 						<button 
 							onClick={() => { setOpen(true); setMobileMenuOpen(false); }}
@@ -113,6 +113,13 @@ export default function NavBar() {
 								className="block px-3 py-2 ml-3 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"
 							>
 								♻️ AI Plastic Calculator
+							</Link>
+							<Link 
+								href="/water-calculator" 
+								onClick={() => setMobileMenuOpen(false)}
+								className="block px-3 py-2 ml-3 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"
+							>
+								💧 Water Footprint Calculator
 							</Link>
 							<Link 
 								href="/event-planner" 
