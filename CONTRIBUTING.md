@@ -1,90 +1,180 @@
-# Contributing to CarbonX
+# 🧩 Contributing to CarbonX
 
-Thank you for your interest in contributing to CarbonX! We welcome contributions from the community to help build a sustainable future with AI and blockchain technology.
+Thank you for your interest in contributing to **CarbonX**! 🎉  
+We’re excited to have you join our open-source community. This guide will help you make your first contribution successfully and maintain consistency across the project.
 
-## How to Contribute
+---
 
-### Reporting Issues
-- Check if the issue already exists before creating a new one
-- Use clear and descriptive titles
-- Provide detailed steps to reproduce bugs
-- Include screenshots or code snippets when relevant
+## 🚀 Getting Started
 
-### Submitting Pull Requests
+### 1. Fork the Repository
+Click the **Fork** button at the top-right corner of the [CarbonX repository](https://github.com/AkshitTiwarii/carbonx).  
+This will create a copy of the repository under your GitHub account.
 
-1. **Fork the repository** and create your branch from `main`
-2. **Create an issue first** before working on a feature or bug fix
-3. **Clone your fork** locally:
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/carbonx.git
-   cd carbonx
-   ```
+### 2. Clone Your Fork
+Clone your forked repository to your local machine:
 
-4. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/<your-username>/carbonx.git
+```
+### 3. Navigate to the Project Directory
 
-5. **Create a new branch**:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+```bash
+cd carbonx
+```
+### 4. Add the Original Repository as a Remote
+```bash
+git remote add upstream https://github.com/AkshitTiwarii/carbonx.git
+```
+This helps you keep your fork up to date with the main project.
 
-6. **Make your changes** following our coding standards
+## Creating a New Branch
+Before you start making changes, create a new branch:
+```bash
+git checkout -b feature/your-feature-name
+```
+Branch Naming Conventions:
+feature/<name> → for new features
+fix/<name> → for bug fixes
+docs/<name> → for documentation updates
+refactor/<name> → for code improvements
 
-7. **Test your changes** thoroughly
+Example:
+```bash
+git checkout -b fix/navbar-alignment
+```
+## 🛠️ Making Changes
 
-8. **Commit your changes**:
-   ```bash
-   git commit -m "Brief description of your changes"
-   ```
+Follow the existing code style and naming conventions.
+Keep your changes small and focused on a single topic.
+Write clear, descriptive comments in your code.
+If you add a new feature, ensure it’s well-documented.
 
-9. **Push to your fork**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+🧑‍💻 Coding Style Guidelines
 
-10. **Open a Pull Request** with a clear description and reference the issue number (e.g., `Fixes #123`)
+Indentation: 2 spaces (no tabs)
 
-## Development Guidelines
+Naming conventions:
+```bash
+Variables & functions → camelCase
+Components & classes → PascalCase
+Constants → UPPER_SNAKE_CASE
+```
+Use meaningful names for all functions, variables, and files.
 
-### Code Style
-- Follow TypeScript best practices and use proper typing
-- Use Tailwind CSS for styling consistently
-- Follow the existing project structure
-- Keep components modular and reusable
-- Write clean, readable, and well-documented code
+Keep your code clean and modular. Avoid duplication.
 
-### Testing
-- Test your changes across different browsers
-- Ensure responsive design works on mobile devices
-- Verify AI features work correctly with API integrations
+## Commit Guidelines
 
-### Commit Messages
-- Use clear and meaningful commit messages
-- Start with a verb (Add, Fix, Update, Remove, etc.)
-- Keep the first line under 50 characters
-- Add detailed description if needed
+Use clear and descriptive commit messages:
+```bash
+git commit -m "fix: corrected navbar alignment issue"
+```
 
-### Pull Request Guidelines
-- Link to the related issue in your PR description
-- Provide a clear description of what changes were made
-- Include screenshots for UI changes
-- Make sure all checks pass before requesting review
-- Be responsive to feedback and update your PR accordingly
+Commit Message Format:
 
-## Code of Conduct
+```bash
+<type>: <short description>
+```
 
-- Be respectful and inclusive
-- Welcome newcomers and help them get started
-- Focus on constructive feedback
-- Respect different viewpoints and experiences
+Common Types:
+```bash
+feat: — new feature
 
-## Questions?
+fix: — bug fix
 
-If you have questions or need help, feel free to:
-- Open an issue for discussion
-- Reach out to the maintainers
-- Check existing documentation and issues
+docs: — documentation change
 
-Thank you for contributing to CarbonX! 🌱
+refactor: — code improvement
+
+style: — formatting, missing semi-colons, etc.
+
+chore: — build process, tools, or dependencies
+```
+
+Example:
+```bash
+feat: add user authentication module
+fix: resolve login redirect bug
+docs: update README with setup steps
+```
+
+## 🔄 Keeping Your Fork Updated
+
+Before making a pull request, make sure your fork is up to date:
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
+
+## 📤 Submitting a Pull Request (PR)
+
+- Push your branch to your fork:
+
+```bash
+git push origin feature/your-feature-name
+```
+
+## 📤 Submitting a Pull Request (PR)
+
+- Go to your fork on **GitHub**.  
+- Click **“Compare & pull request”**.  
+- **Fill in the PR template:**
+  - A clear **title**.  
+  - A short **description** of what you changed and why.  
+  - Reference related issues using `Fixes #issue-number`.  
+- **Wait for the maintainers to review your PR.**  
+- Be ready to make changes if requested! ✨
+
+
+## 🐛 Reporting Issues
+
+Found a bug or want to request a feature? Open an issue!
+
+### Issue Format:
+
+#### Title:
+Short and descriptive (e.g., “Navbar not responsive on mobile”)
+
+#### Description:
+
+- Steps to reproduce the issue
+- Expected behavior
+- Actual behavior
+- Screenshots (if applicable)
+
+#### Labels:
+Use labels like ``` bug```, ```enhancement```, ```documentation```, etc. when possible.
+
+## 🧾 Additional Tips
+
+- Keep your PRs **focused** — one feature or bug fix per pull request.  
+- Always **test** your changes before submitting.  
+- Be respectful and collaborative — we’re all here to learn and build together. 💙
+
+## 🤝 Code of Conduct
+
+By participating in this project, you agree to uphold our community standards:
+
+- Be respectful and welcoming.  
+- Offer constructive feedback.  
+- Assume good intent from others.  
+- Collaborate and share knowledge freely.  
+
+---
+
+## 💡 Need Help?
+
+If you have any questions, feel free to:
+
+- Open a [discussion](https://github.com/AkshitTiwarii/carbonx/discussions)  
+- Or reach out via [issues](https://github.com/AkshitTiwarii/carbonx/issues)  
+
+---
+
+## 🧠 Final Note
+
+Every contribution — big or small — makes a difference.  
+Thank you for helping improve **CarbonX**! 🌟
+
