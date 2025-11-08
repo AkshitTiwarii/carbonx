@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Calculator, Recycle, Calendar, Leaf, MessageCircle, TrendingUp, BarChart3 } from "lucide-react";
+import { ChevronDown, Calculator, Recycle, Calendar, Leaf, MessageCircle, TrendingUp, BarChart3, Droplet } from "lucide-react";
 
 interface AITool {
   id: string;
@@ -31,6 +31,15 @@ const AI_TOOLS: AITool[] = [
     href: '/plastic-calculator',
     icon: <Recycle className="w-5 h-5" />,
     badge: 'AI',
+    status: 'available'
+  },
+  {
+    id: 'water-calculator',
+    name: 'Water Footprint Calculator',
+    description: 'Estimate your water consumption and discover personalized conservation tips based on your lifestyle',
+    href: '/water-calculator',
+    icon: <Droplet className="w-5 h-5" />,
+    badge: 'NEW',
     status: 'available'
   },
   {
