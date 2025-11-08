@@ -57,6 +57,9 @@ export default function NavBar() {
 						/>
 					</div>
 					
+					<Link href="/rewards" className="px-3 py-1.5 rounded-full hover:bg-zinc-800/60 transition-colors flex items-center gap-1">
+						🏆 Rewards
+					</Link>
 					<Link href="#how-it-works" className="px-3 py-1.5 rounded-full hover:bg-zinc-800/60 transition-colors">How it works</Link>
 					<Link href="#why" className="px-3 py-1.5 rounded-full hover:bg-zinc-800/60 transition-colors">Why CarbonX</Link>
 				</nav>
@@ -137,6 +140,13 @@ export default function NavBar() {
 							</Link>
 						</div>
 						
+						<Link 
+							href="/rewards" 
+							onClick={() => setMobileMenuOpen(false)}
+							className="block px-3 py-2 rounded-lg text-zinc-300 hover:bg-zinc-800/60 transition-colors"
+						>
+							🏆 Rewards
+						</Link>
 						<Link 
 							href="#how-it-works" 
 							onClick={() => setMobileMenuOpen(false)}
