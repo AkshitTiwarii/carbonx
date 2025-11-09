@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth, credits
+from routers import auth, credits, rewards
 
 app = FastAPI(title="CarbonX Backend", version="0.1.0")
 
@@ -19,6 +19,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(credits.router, prefix="/api/credits", tags=["credits"])
+app.include_router(rewards.router, prefix="/api/rewards", tags=["rewards"])
 
 @app.get("/")
 def root():
