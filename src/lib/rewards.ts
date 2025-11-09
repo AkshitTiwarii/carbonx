@@ -121,8 +121,11 @@ export function getUserId(): string | null {
   if (typeof window !== 'undefined') {
     let userId = localStorage.getItem('carbonx_user_id');
     if (!userId) {
-      // Generate a temporary user ID for demo purposes
-      userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      // Generate a temporary user ID for demo purposes using secure randomness
+      const array = new Uint8Array(9);
+      window.crypto.getRandomValues(array);
+      const randomStr = Array.from(array).map(b => b.toString(36)).join('');
+      userId = `user_${Date.now()}_${randomStr}`;
       localStorage.setItem('carbonx_user_id', userId);
     }
     return userId;
