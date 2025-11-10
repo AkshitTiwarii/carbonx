@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2, Calculator, Lightbulb, TrendingUp, Leaf } from 'lucide-react';
+import { useRewards } from '@/hooks/useRewards';
 
 interface CalculationResult {
   totalEmissions: number;
@@ -41,6 +42,7 @@ export default function AICarbonCalculator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [generatingReport, setGeneratingReport] = useState(false);
+  const { awardPoints } = useRewards();
 
   const calculateCredits = async (includeReport = false) => {
     if (!query.trim()) {
@@ -68,6 +70,22 @@ export default function AICarbonCalculator() {
 
       if (data.success) {
         setResult(data.data);
+        
+        // Award EcoPoints for using AI calculator
+        try {
+          await awardPoints({
+            type: 'ai_tool_use',
+            amount: 1,
+            metadata: {
+              calculator_type: 'carbon',
+              query: query.substring(0, 100), // Store first 100 chars
+              credits_needed: data.data.creditsNeeded,
+            },
+          });
+        } catch (rewardError) {
+          // Don't block the calculation if rewards fail
+          console.warn('Failed to award points:', rewardError);
+        }
         
         if (includeReport && data.data.reportContent) {
           downloadReport(data.data);

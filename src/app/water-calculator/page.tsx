@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Droplet, Loader2, Calculator, Users, MapPin, TrendingDown, Lightbulb, Globe } from "lucide-react";
+import { useRewards } from "@/hooks/useRewards";
 
 interface WaterCalculatorInputs {
   dietType: "vegetarian" | "non-vegetarian" | "vegan";
@@ -81,6 +82,7 @@ export default function WaterCalculatorPage() {
   const [result, setResult] = useState<WaterCalculatorResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { awardPoints } = useRewards();
 
   const handleCalculate = async () => {
     setLoading(true);
@@ -102,6 +104,23 @@ export default function WaterCalculatorPage() {
       }
 
       setResult(data.data);
+      
+      // Award EcoPoints for using water calculator
+      try {
+        await awardPoints({
+          type: 'water_calculation',
+          amount: 1,
+          metadata: {
+            calculator_type: 'water',
+            daily_liters: data.data.daily_liters,
+            household_size: inputs.householdSize,
+            location: inputs.location,
+          },
+        });
+      } catch (rewardError) {
+        // Don't block the calculation if rewards fail
+        console.warn('Failed to award points:', rewardError);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2, Calculator, Recycle, AlertTriangle, Leaf, Download } from 'lucide-react';
+import { useRewards } from '@/hooks/useRewards';
 
 interface PlasticCalculationResult {
   analysisType: string;
@@ -70,6 +71,7 @@ export default function AIPlasticCalculator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [generatingReport, setGeneratingReport] = useState(false);
+  const { awardPoints } = useRewards();
 
   const calculatePlasticFootprint = async (includeReport = false) => {
     if (!query.trim()) {
@@ -97,6 +99,22 @@ export default function AIPlasticCalculator() {
 
       if (data.success) {
         setResult(data.data);
+        
+        // Award EcoPoints for using plastic calculator
+        try {
+          await awardPoints({
+            type: 'plastic_calculation',
+            amount: 1,
+            metadata: {
+              calculator_type: 'plastic',
+              query: query.substring(0, 100),
+              total_plastic: data.data.plasticFootprint?.totalAnnualPlastic || 0,
+            },
+          });
+        } catch (rewardError) {
+          // Don't block the calculation if rewards fail
+          console.warn('Failed to award points:', rewardError);
+        }
         
         if (includeReport && data.data.reportContent) {
           downloadReport(data.data);

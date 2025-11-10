@@ -19,18 +19,21 @@ interface BadgeCollectionProps {
 
 export default function BadgeCollection({ earnedBadges, allBadges }: BadgeCollectionProps) {
   const [badges, setBadges] = useState<Badge[]>([]);
-  const earnedBadgeIds = new Set(earnedBadges.map(b => b.id));
+  const earnedBadgeIds = new Set(earnedBadges.map(b => b.id || b));
 
   useEffect(() => {
-    if (allBadges) {
+    if (allBadges && Object.keys(allBadges).length > 0) {
       // Combine earned and unearned badges
-      const allBadgesList = Object.entries(allBadges).map(([id, badge]) => ({
-        id,
+      const allBadgesList = Object.entries(allBadges).map(([badgeId, badge]) => ({
+        id: badgeId,
         ...badge,
       }));
       setBadges(allBadgesList);
+    } else if (earnedBadges && earnedBadges.length > 0) {
+      // If we only have earned badges, use those
+      setBadges(earnedBadges.map(b => typeof b === 'string' ? { id: b, name: b, description: '', icon: '🏆' } : b));
     } else {
-      setBadges(earnedBadges);
+      setBadges([]);
     }
   }, [earnedBadges, allBadges]);
 

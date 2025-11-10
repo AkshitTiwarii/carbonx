@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Trophy, Medal, Award, TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 interface LeaderboardEntry {
   user_id: string;
@@ -15,32 +15,106 @@ interface LeaderboardEntry {
 
 interface LeaderboardProps {
   currentUserId?: string;
+  refreshTrigger?: number; // Add refresh trigger prop
 }
 
-export default function Leaderboard({ currentUserId }: LeaderboardProps) {
+export default function Leaderboard({ currentUserId, refreshTrigger }: LeaderboardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState<string>("global");
+  const [currentUserEntry, setCurrentUserEntry] = useState<LeaderboardEntry | null>(null);
 
-  useEffect(() => {
-    fetchLeaderboard();
-  }, [region]);
-
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/rewards/leaderboard?limit=100&region=${region}`);
+      
+      // Add cache-busting to ensure fresh data
+      const cacheBuster = `&_t=${Date.now()}`;
+      let response: Response;
+      try {
+        response = await fetch(`/api/rewards/leaderboard?limit=100&region=${region}${cacheBuster}`, {
+          cache: 'no-store',
+        });
+      } catch (fetchError: any) {
+        if (fetchError.message?.includes('fetch') || fetchError.message?.includes('network')) {
+          throw new Error('Network error. Please check your connection.');
+        }
+        throw fetchError;
+      }
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail?.message || errorData.error || `HTTP ${response.status}`);
+      }
+      
       const data = await response.json();
       
-      if (data.success) {
-        setLeaderboard(data.leaderboard || []);
+      if (data.success && data.leaderboard) {
+        const entries = Array.isArray(data.leaderboard) ? data.leaderboard : [];
+        
+        // Find current user entry if they're in the leaderboard
+        const userEntry = entries.find((entry: LeaderboardEntry) => entry.user_id === currentUserId);
+        setCurrentUserEntry(userEntry || null);
+        
+        // If current user is not in top 100, fetch their position separately
+        if (!userEntry && currentUserId) {
+          try {
+            const userResponse = await fetch(`/api/rewards/user?user_id=${encodeURIComponent(currentUserId)}&_t=${Date.now()}`, {
+              cache: 'no-store',
+            });
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              if (userData.success && userData.position) {
+                // Add current user to the list if they're not in top 100
+                setCurrentUserEntry({
+                  user_id: currentUserId,
+                  ecoPoints: userData.ecoPoints || 0,
+                  rank: userData.rank || 0,
+                  position: userData.position,
+                  badges: (userData.badges || []).map((b: any) => b.id || b),
+                  badge_count: userData.badges?.length || 0,
+                });
+              }
+            }
+          } catch (err) {
+            console.warn("Could not fetch current user position:", err);
+          }
+        }
+        
+        setLeaderboard(entries);
+      } else {
+        console.warn("Leaderboard response not successful:", data);
+        setLeaderboard([]);
+        setCurrentUserEntry(null);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching leaderboard:", error);
+      // Set empty leaderboard on error
+      setLeaderboard([]);
+      setCurrentUserEntry(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [region, currentUserId]);
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard, refreshTrigger]); // Refresh when trigger changes
+
+  // Also listen for reward updates to refresh leaderboard
+  useEffect(() => {
+    const handleRewardUpdate = () => {
+      // Refresh leaderboard after a short delay to ensure backend has updated
+      setTimeout(() => {
+        fetchLeaderboard();
+      }, 1000);
+    };
+
+    window.addEventListener("rewardUpdate", handleRewardUpdate);
+    return () => {
+      window.removeEventListener("rewardUpdate", handleRewardUpdate);
+    };
+  }, [fetchLeaderboard]);
 
   const getPositionIcon = (position: number) => {
     if (position === 1) return <Trophy className="w-5 h-5 text-yellow-400" />;
@@ -98,9 +172,61 @@ export default function Leaderboard({ currentUserId }: LeaderboardProps) {
           <p>No entries yet. Be the first to earn EcoPoints!</p>
         </div>
       ) : (
-        <div className="space-y-2 max-h-[600px] overflow-y-auto">
-          {leaderboard.map((entry, index) => {
-            const isCurrentUser = currentUserId === entry.user_id;
+        <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
+          {/* Show current user entry if they're not in top 100 */}
+          {currentUserEntry && !leaderboard.find(e => e.user_id === currentUserId) && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mb-4 pb-4 border-b border-zinc-700/50"
+            >
+              <div className="text-xs text-zinc-500 mb-2 px-2">Your Position</div>
+              <motion.div
+                className="flex items-center gap-4 p-4 rounded-lg border-2 bg-indigo-500/10 border-indigo-500/50 ring-2 ring-indigo-500"
+              >
+                <div className="flex-shrink-0 w-12 flex items-center justify-center">
+                  <span className="text-zinc-400 font-semibold">#{currentUserEntry.position}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold truncate text-indigo-400">You</span>
+                    <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full">
+                      You
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-1 text-sm text-zinc-400">
+                    <span>{currentUserEntry.ecoPoints.toLocaleString()} pts</span>
+                    <span>•</span>
+                    <span>Level {currentUserEntry.rank}</span>
+                    {currentUserEntry.badge_count > 0 && (
+                      <>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <Trophy className="w-3 h-3" />
+                          {currentUserEntry.badge_count} badges
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <div className="text-lg font-bold text-green-400">
+                    {currentUserEntry.ecoPoints.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-zinc-500">points</div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+          
+          {/* Top Leaderboard Entries */}
+          {leaderboard.length > 0 && (
+            <>
+              {currentUserEntry && !leaderboard.find(e => e.user_id === currentUserId) && (
+                <div className="text-xs text-zinc-500 mb-2 px-2">Top Rankings</div>
+              )}
+              {leaderboard.map((entry, index) => {
+                const isCurrentUser = currentUserId === entry.user_id;
             
             return (
               <motion.div
@@ -157,6 +283,8 @@ export default function Leaderboard({ currentUserId }: LeaderboardProps) {
               </motion.div>
             );
           })}
+            </>
+          )}
         </div>
       )}
     </div>
