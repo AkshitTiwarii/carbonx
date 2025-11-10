@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Development blockchain with hot reload
+  blockchain:
+    build:
+      context: .
+      dockerfile: Dockerfile.blockchain
+    container_name: carbonx-blockchain-dev
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./smart_contracts:/app
+      - blockchain_data:/app/data
+    networks:
+      - carbonx-dev
+    command: ["sh", "-c", "npm install && ./node_modules/.bin/hardhat node --hostname 0.0.0.0"]
+
+  # Development backend with hot reload
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: carbonx-backend-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+      - ENVIRONMENT=development
+    volumes:
+      - ./backend:/app
+      - backend_data:/app/data
+    networks:
+      - carbonx-dev
+    depends_on:
+      - blockchain
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # Development frontend with hot reload
+  frontend:
+    image: node:18-alpine
+    container_name: carbonx-frontend-dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_BASE=http://localhost:8000
+      - NEXT_PUBLIC_BLOCKCHAIN_URL=http://localhost:8545
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - carbonx-dev
+    depends_on:
+      - backend
+    command: [
+      "sh", "-c", 
+      "npm install && npm run dev"
+    ]
+
+volumes:
+  blockchain_data:
+  backend_data:
+
+networks:
+  carbonx-dev:
+    driver: bridge

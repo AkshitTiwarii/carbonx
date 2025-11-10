@@ -1,0 +1,33 @@
+# Hardhat blockchain node container
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY smart_contracts/package*.json ./
+RUN npm ci
+
+# Install hardhat globally and locally
+RUN npm install -g hardhat
+RUN npm install hardhat --save-dev
+
+# Copy smart contracts
+COPY smart_contracts/ .
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S hardhat -u 1001
+
+# Create data directory for blockchain persistence
+RUN mkdir -p /app/data && chown -R hardhat:nodejs /app
+USER hardhat
+
+# Expose Hardhat node port
+EXPOSE 8545
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8545 || exit 1
+
+# Start Hardhat node
+CMD ["./node_modules/.bin/hardhat", "node", "--hostname", "0.0.0.0"]

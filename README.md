@@ -56,46 +56,62 @@
 - **Web3 Library**: ThirdWeb + Ethers.js
 - **Wallet**: MetaMask integration
 
+### DevOps & Deployment
+- **Containerization**: Docker + Docker Compose
+- **Development**: Hot reload for all services
+- **Production**: Multi-stage builds with optimization
+- **Orchestration**: Service networking and health checks
+
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js 18.x or higher
-- npm or yarn package manager
-- MetaMask browser extension (for Web3 features)
-- Google AI API key (for AI features)
+### Option 1: Docker (Recommended)
 
-### Installation
+**Prerequisites**: Docker and Docker Compose
 
-1. **Clone the repository**
 ```bash
+# Clone repository
 git clone https://github.com/AkshitTiwarii/carbonx.git
 cd carbonx
+
+# Set up environment
+cp .env.example .env.local
+# Add your API keys to .env.local
+
+# Start entire stack
+docker-compose -f docker-compose.dev.yml up -d
+
+# Access application
+open http://localhost:3000
 ```
 
-2. **Install dependencies**
+### Option 2: Manual Setup
+
+**Prerequisites**: Node.js 18+, Python 3.8+
+
+1. **Install dependencies**
 ```bash
 npm install
+cd backend && pip install -r requirements.txt
+cd ../smart_contracts && npm install
 ```
 
-3. **Set up environment variables**
+2. **Set up environment**
 ```bash
 cp .env.example .env.local
+# Add your API keys
 ```
 
-Add your API keys to `.env.local`:
-```env
-GEMINI_API_KEY=your_google_ai_api_key_here
-THIRDWEB_API_KEY=your_thirdweb_api_key_here
-NEXTAUTH_URL=http://localhost:3000
-```
-
-4. **Start the development server**
+3. **Start services**
 ```bash
+# Terminal 1: Blockchain
+cd smart_contracts && npx hardhat node
+
+# Terminal 2: Backend
+cd backend && uvicorn main:app --reload
+
+# Terminal 3: Frontend
 npm run dev
 ```
-
-5. **Open your browser**
-Navigate to `http://localhost:3000` to see the application.
 
 ## 📱 Application Structure
 
