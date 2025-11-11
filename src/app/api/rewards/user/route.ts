@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching completely
 
 // Remove trailing slash to prevent double slashes in URLs
 const BACKEND_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000').replace(/\/$/, '');
@@ -65,16 +66,30 @@ export async function GET(request: NextRequest) {
           success: false, 
           error: typeof errorDetail === 'string' ? errorDetail : (errorDetail.message || 'Failed to fetch user rewards') 
         },
-        { status: response.status }
+        { 
+          status: response.status,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          }
+        }
       );
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      }
+    });
   } catch (error: any) {
     console.error('User rewards fetch error:', error);
     return NextResponse.json(
       { success: false, error: error.message || 'Internal server error' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        }
+      }
     );
   }
 }
