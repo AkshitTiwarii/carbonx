@@ -7,6 +7,7 @@ app = FastAPI(title="CarbonX Backend", version="0.1.0")
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://carbonx-future.vercel.app",  # Production frontend
 ]
 
 app.add_middleware(
