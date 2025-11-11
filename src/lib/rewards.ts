@@ -242,9 +242,15 @@ export async function getAllBadges() {
  * This is a placeholder - integrate with your actual auth system
  */
 export function getUserId(): string | null {
-  // TODO: Integrate with actual authentication
-  // For now, use localStorage or session storage
+  // Use wallet address if connected, otherwise use localStorage
   if (typeof window !== 'undefined') {
+    // Try to get wallet address from thirdweb
+    const walletAddress = (window as any).thirdwebWalletAddress;
+    if (walletAddress) {
+      return `wallet_${walletAddress.toLowerCase()}`;
+    }
+    
+    // Fallback to localStorage for non-wallet users
     let userId = localStorage.getItem('carbonx_user_id');
     if (!userId) {
       // Generate a temporary user ID for demo purposes using secure randomness

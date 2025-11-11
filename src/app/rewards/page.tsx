@@ -45,7 +45,8 @@ export default function RewardsPage() {
   } | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const account = useActiveAccount();
-  const userId = getUserId();
+  // Use wallet address if connected, otherwise use getUserId()
+  const userId = account?.address ? `wallet_${account.address.toLowerCase()}` : getUserId();
 
   useEffect(() => {
     loadRewardsData();
