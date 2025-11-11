@@ -21,7 +21,8 @@ interface UseRewardsReturn {
 export function useRewards(): UseRewardsReturn {
   const [loading, setLoading] = useState(false);
   const account = useActiveAccount();
-  const userId = getUserId();
+  // Use wallet address if connected, otherwise use getUserId()
+  const userId = account?.address ? `wallet_${account.address.toLowerCase()}` : getUserId();
 
   const awardPoints = useCallback(async (action: {
     type: 'carbon_offset' | 'calculator_use' | 'water_calculation' | 'plastic_calculation' | 'ai_tool_use' | 'investment' | 'energy_savings';
