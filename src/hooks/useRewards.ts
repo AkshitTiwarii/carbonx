@@ -11,7 +11,7 @@ interface UseRewardsReturn {
     type: 'carbon_offset' | 'calculator_use' | 'water_calculation' | 'plastic_calculation' | 'ai_tool_use' | 'investment' | 'energy_savings';
     amount?: number;
     metadata?: Record<string, any>;
-  }) => Promise<{ success: boolean; points_earned?: number; new_badges?: any[]; error?: string }>;
+  }) => Promise<{ success: boolean; points_earned?: number; total_points?: number; rank?: number; new_badges?: any[]; error?: string }>;
   loading: boolean;
 }
 
