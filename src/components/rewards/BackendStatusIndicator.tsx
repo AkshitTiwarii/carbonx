@@ -13,7 +13,8 @@ export default function BackendStatusIndicator() {
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
         
         // Use environment variable or fallback to localhost for development
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+        // Remove trailing slash to prevent double slashes
+        const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000").replace(/\/$/, "");
         const response = await fetch(`${backendUrl}/`, {
           method: "GET",
           signal: controller.signal,
