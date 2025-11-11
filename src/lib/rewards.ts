@@ -33,7 +33,7 @@ export interface UserRewards {
 export async function awardEcoPoints(
   user_id: string,
   action: RewardAction
-): Promise<{ success: boolean; points_earned?: number; new_badges?: any[]; error?: string; code?: string }> {
+): Promise<{ success: boolean; points_earned?: number; total_points?: number; rank?: number; new_badges?: any[]; error?: string; code?: string }> {
   try {
     // Validate inputs
     if (!user_id || typeof user_id !== 'string' || user_id.trim().length === 0) {

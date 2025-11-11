@@ -11,7 +11,7 @@ interface UseRewardsReturn {
     type: 'carbon_offset' | 'calculator_use' | 'water_calculation' | 'plastic_calculation' | 'ai_tool_use' | 'investment' | 'energy_savings';
     amount?: number;
     metadata?: Record<string, any>;
-  }) => Promise<{ success: boolean; points_earned?: number; new_badges?: any[]; error?: string }>;
+  }) => Promise<{ success: boolean; points_earned?: number; total_points?: number; rank?: number; new_badges?: any[]; error?: string }>;
   loading: boolean;
 }
 
@@ -125,8 +125,8 @@ export function useRewards(): UseRewardsReturn {
               new CustomEvent('rewardUpdate', {
                 detail: {
                   pointsEarned: result.points_earned,
-                  totalPoints: result.total_points || result.points_earned,
-                  rank: result.rank,
+                  totalPoints: (result as any).total_points || result.points_earned || 0,
+                  rank: (result as any).rank || 0,
                   newBadges: result.new_badges || [],
                 },
               })
@@ -143,8 +143,8 @@ export function useRewards(): UseRewardsReturn {
               new CustomEvent('rewardUpdate', {
                 detail: {
                   pointsEarned: result.points_earned,
-                  totalPoints: result.total_points || result.points_earned,
-                  rank: result.rank,
+                  totalPoints: (result as any).total_points || result.points_earned || 0,
+                  rank: (result as any).rank || 0,
                   newBadges: [],
                 },
               })

@@ -25,8 +25,8 @@ export default function BadgeCollection({ earnedBadges, allBadges }: BadgeCollec
     if (allBadges && Object.keys(allBadges).length > 0) {
       // Combine earned and unearned badges
       const allBadgesList = Object.entries(allBadges).map(([badgeId, badge]) => ({
-        id: badgeId,
         ...badge,
+        id: badge.id || badgeId,
       }));
       setBadges(allBadgesList);
     } else if (earnedBadges && earnedBadges.length > 0) {
