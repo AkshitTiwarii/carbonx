@@ -1,61 +1,50 @@
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional
-from datetime import datetime
-import json
 import os
+import json
 import logging
 import traceback
+from datetime import datetime
+from typing import Optional
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Error response model
-class ErrorResponse(BaseModel):
-    success: bool = False
-    status: str
-    message: str
-    code: str
-    details: Optional[dict] = None
-
-# In-memory storage (in production, use a database)
+# File-based database for rewards (simple implementation)
 REWARDS_DB_FILE = "rewards_db.json"
 
 # Badge definitions
 BADGE_DEFINITIONS = {
     "carbon_saver": {
         "name": "Carbon Saver",
-        "description": "Offset your first 1 ton of CO2",
-        "points_required": 100,
+        "description": "Offset 100+ tons of CO2",
+        "points_required": 500,
         "icon": "🌱"
     },
     "green_champion": {
         "name": "Green Champion",
-        "description": "Offset 10 tons of CO2",
+        "description": "Reach 1000 EcoPoints",
         "points_required": 1000,
         "icon": "🏆"
     },
     "eco_investor": {
         "name": "Eco Investor",
-        "description": "Invest in 5+ carbon credit projects",
-        "points_required": 500,
+        "description": "Make 5+ green investments",
+        "points_required": 0,
         "icon": "💚"
     },
     "calculator_master": {
         "name": "Calculator Master",
-        "description": "Use all calculator tools 10+ times",
-        "points_required": 200,
+        "description": "Use calculators 10+ times",
+        "points_required": 0,
         "icon": "🧮"
     },
     "water_warrior": {
         "name": "Water Warrior",
-        "description": "Calculate and reduce water footprint",
+        "description": "Complete water footprint analysis",
         "points_required": 150,
         "icon": "💧"
     },
@@ -248,310 +237,245 @@ def update_user_rewards(user_id: str, updates: dict):
 
 def check_badge_eligibility(user_id: str, eco_points: int, action_type: str):
     """Check if user is eligible for new badges"""
-    user = get_user_rewards(user_id)
-    earned_badges = set(user.get("badges", []))
-    new_badges = []
-    
-    # Check each badge definition
-    for badge_id, badge_def in BADGE_DEFINITIONS.items():
-        if badge_id in earned_badges:
-            continue  # Already earned
+    try:
+        # Input validation
+        if not user_id or not isinstance(user_id, str):
+            logger.warning(f"Invalid user_id in badge eligibility check: {user_id}")
+            return []
         
-        # Check if user meets criteria
-        eligible = False
+        if not isinstance(eco_points, (int, float)) or eco_points < 0:
+            logger.warning(f"Invalid eco_points in badge eligibility check: {eco_points}")
+            eco_points = 0
         
-        if badge_id == "carbon_saver" and eco_points >= badge_def["points_required"]:
-            eligible = True
-        elif badge_id == "green_champion" and eco_points >= badge_def["points_required"]:
-            eligible = True
-        elif badge_id == "eco_investor":
-            # Count investments from actions
-            investments = sum(1 for a in user.get("actions", []) if a.get("type") == "investment")
-            if investments >= 5:
-                eligible = True
-        elif badge_id == "calculator_master":
-            calc_uses = sum(1 for a in user.get("actions", []) if "calculator" in a.get("type", ""))
-            if calc_uses >= 10:
-                eligible = True
-        elif badge_id == "water_warrior" and action_type == "water_calculation":
-            eligible = True
-        elif badge_id == "plastic_fighter" and action_type == "plastic_calculation":
-            eligible = True
-        elif badge_id == "ai_explorer":
-            ai_uses = sum(1 for a in user.get("actions", []) if "ai" in a.get("type", "").lower())
-            if ai_uses >= 20:
-                eligible = True
-        elif badge_id == "sustainability_hero" and eco_points >= badge_def["points_required"]:
-            eligible = True
+        if not isinstance(action_type, str):
+            action_type = ""
         
-        if eligible:
-            new_badges.append(badge_id)
-            earned_badges.add(badge_id)
-    
-    return new_badges
+        user = get_user_rewards(user_id)
+        if not isinstance(user, dict):
+            logger.error(f"Failed to get user data for badge eligibility: {user_id}")
+            return []
+        
+        earned_badges = set(user.get("badges", []))
+        new_badges = []
+        
+        # Check each badge definition
+        for badge_id, badge_def in BADGE_DEFINITIONS.items():
+            try:
+                if badge_id in earned_badges:
+                    continue  # Already earned
+                
+                # Check if user meets criteria
+                eligible = False
+                
+                if badge_id == "carbon_saver" and eco_points >= badge_def["points_required"]:
+                    eligible = True
+                elif badge_id == "green_champion" and eco_points >= badge_def["points_required"]:
+                    eligible = True
+                elif badge_id == "eco_investor":
+                    # Count investments from actions
+                    try:
+                        investments = sum(1 for a in user.get("actions", []) if isinstance(a, dict) and a.get("type") == "investment")
+                        if investments >= 5:
+                            eligible = True
+                    except Exception as e:
+                        logger.warning(f"Error counting investments for {user_id}: {e}")
+                elif badge_id == "calculator_master":
+                    try:
+                        calc_uses = sum(1 for a in user.get("actions", []) if isinstance(a, dict) and "calculator" in str(a.get("type", "")))
+                        if calc_uses >= 10:
+                            eligible = True
+                    except Exception as e:
+                        logger.warning(f"Error counting calculator uses for {user_id}: {e}")
+                elif badge_id == "water_warrior" and action_type == "water_calculation":
+                    eligible = True
+                elif badge_id == "plastic_fighter" and action_type == "plastic_calculation":
+                    eligible = True
+                elif badge_id == "ai_explorer":
+                    try:
+                        ai_uses = sum(1 for a in user.get("actions", []) if isinstance(a, dict) and "ai" in str(a.get("type", "")).lower())
+                        if ai_uses >= 20:
+                            eligible = True
+                    except Exception as e:
+                        logger.warning(f"Error counting AI uses for {user_id}: {e}")
+                elif badge_id == "sustainability_hero" and eco_points >= badge_def["points_required"]:
+                    eligible = True
+                
+                if eligible:
+                    new_badges.append(badge_id)
+                    logger.info(f"User {user_id} earned new badge: {badge_id}")
+                    
+            except Exception as e:
+                logger.error(f"Error checking badge {badge_id} for user {user_id}: {e}")
+                continue
+        
+        return new_badges
+        
+    except Exception as e:
+        logger.error(f"Critical error in check_badge_eligibility for {user_id}: {e}")
+        logger.error(traceback.format_exc())
+        return []
 
 def calculate_rank(eco_points: int) -> int:
     """Calculate user rank based on points"""
-    # Simple ranking: every 100 points = 1 rank level
-    return max(1, eco_points // 100)
+    try:
+        # Input validation
+        if not isinstance(eco_points, (int, float)):
+            logger.warning(f"Invalid eco_points type for rank calculation: {type(eco_points)}")
+            return 1
+        
+        if eco_points < 0:
+            logger.warning(f"Negative eco_points for rank calculation: {eco_points}")
+            eco_points = 0
+        
+        # Prevent overflow
+        if eco_points > 1000000:  # 1M points max
+            logger.warning(f"Eco_points too high for rank calculation: {eco_points}")
+            eco_points = 1000000
+        
+        # Simple ranking: every 100 points = 1 rank level
+        rank = max(1, int(eco_points // 100))
+        
+        # Cap maximum rank
+        return min(rank, 10000)
+        
+    except Exception as e:
+        logger.error(f"Error in calculate_rank with eco_points {eco_points}: {e}")
+        return 1
 
 class UpdateRewardsRequest(BaseModel):
-    user_id: str = Field(..., min_length=1, description="User identifier")
-    action_type: str = Field(..., description="Type of eco-action performed")
-    amount: Optional[float] = Field(1.0, ge=0, description="Amount for the action (e.g., tons of CO2)")
-    metadata: Optional[dict] = Field(default_factory=dict, description="Additional metadata")
-    
-    @validator('action_type')
-    def validate_action_type(cls, v):
-        valid_types = list(ACTION_POINTS.keys())
-        if v not in valid_types:
-            raise ValueError(f"Invalid action_type. Must be one of: {', '.join(valid_types)}")
-        return v
-    
-    @validator('user_id')
-    def validate_user_id(cls, v):
-        if not v or not isinstance(v, str) or len(v.strip()) == 0:
-            raise ValueError("user_id must be a non-empty string")
-        return v.strip()
-    
-    @validator('amount')
-    def validate_amount(cls, v):
-        if v is not None and (not isinstance(v, (int, float)) or v < 0):
-            raise ValueError("amount must be a non-negative number")
-        return float(v) if v is not None else 1.0
+    user_id: str
+    action_type: str  # carbon_offset, calculator_use, water_calculation, etc.
+    amount: Optional[float] = 1.0  # For actions like carbon_offset, amount in tons
+    metadata: Optional[dict] = {}
 
 class LeaderboardQuery(BaseModel):
     limit: Optional[int] = 100
     region: Optional[str] = None  # For future regional leaderboards
 
-@router.post("/update", response_model_exclude_none=True)
+@router.post("/update")
 def update_rewards(req: UpdateRewardsRequest):
     """Update user rewards when they perform an eco-action"""
     try:
-        # Validate request
-        if not req.user_id:
-            logger.warning("Update rewards called with empty user_id")
-            raise HTTPException(
-                status_code=400,
-                detail={
-                    "success": False,
-                    "status": "validation_error",
-                    "message": "user_id is required",
-                    "code": "INVALID_USER_ID"
-                }
-            )
+        # Input validation
+        if not req.user_id or not isinstance(req.user_id, str) or len(req.user_id.strip()) == 0:
+            logger.warning(f"Invalid user_id in update_rewards: {req.user_id}")
+            raise HTTPException(status_code=400, detail="Invalid user ID provided")
         
-        # Get user data with error handling
-        try:
-            user = get_user_rewards(req.user_id)
-        except Exception as db_error:
-            logger.error(f"Database error getting user rewards: {db_error}")
-            raise HTTPException(
-                status_code=503,
-                detail={
-                    "success": False,
-                    "status": "database_error",
-                    "message": "Failed to access user data. Please try again.",
-                    "code": "DB_ACCESS_ERROR"
-                }
-            )
+        if not req.action_type or not isinstance(req.action_type, str):
+            logger.warning(f"Invalid action_type in update_rewards: {req.action_type}")
+            raise HTTPException(status_code=400, detail="Invalid action type provided")
         
-        # Validate user data structure
-        if not isinstance(user, dict):
-            logger.error(f"Invalid user data structure for {req.user_id}")
-            user = get_user_rewards(req.user_id)  # Retry
+        if not isinstance(req.amount, (int, float)) or req.amount <= 0:
+            logger.warning(f"Invalid amount in update_rewards: {req.amount}")
+            req.amount = 1.0
+        
+        # Rate limiting check (simple implementation)
+        # In production, use Redis or similar
+        
+        logger.info(f"Processing reward update for user {req.user_id}, action: {req.action_type}")
+        
+        user = get_user_rewards(req.user_id)
         
         # Calculate points for this action
         base_points = ACTION_POINTS.get(req.action_type, 10)
-        if not isinstance(base_points, (int, float)):
-            base_points = 10
+        points_earned = int(base_points * req.amount)
         
-        try:
-            amount = float(req.amount) if req.amount is not None else 1.0
-            if amount < 0:
-                amount = 0
-            points_earned = int(base_points * amount)
-        except (ValueError, TypeError) as calc_error:
-            logger.warning(f"Invalid amount calculation: {calc_error}, using default")
-            amount = 1.0
-            points_earned = int(base_points * amount)
-        
-        # Safely get current points
-        try:
-            current_points = int(user.get("ecoPoints", 0)) if isinstance(user.get("ecoPoints"), (int, float)) else 0
-        except (ValueError, TypeError):
-            current_points = 0
-        
-        new_eco_points = current_points + points_earned
+        # Update points
+        new_eco_points = user["ecoPoints"] + points_earned
         new_rank = calculate_rank(new_eco_points)
         
         # Record action
         action = {
             "type": req.action_type,
-            "amount": amount,
+            "amount": req.amount,
             "points_earned": points_earned,
             "timestamp": datetime.now().isoformat(),
-            "metadata": req.metadata if isinstance(req.metadata, dict) else {}
+            "metadata": req.metadata or {}
         }
         
-        # Safely handle actions list
         actions = user.get("actions", [])
-        if not isinstance(actions, list):
-            actions = []
         actions.append(action)
         
-        # Update user with error handling
-        try:
-            update_user_rewards(req.user_id, {
-                "ecoPoints": new_eco_points,
-                "rank": new_rank,
-                "actions": actions[-100:]  # Keep last 100 actions
-            })
-        except Exception as update_error:
-            logger.error(f"Failed to update user rewards: {update_error}")
-            raise HTTPException(
-                status_code=503,
-                detail={
-                    "success": False,
-                    "status": "database_error",
-                    "message": "Failed to save rewards. Points may not have been updated.",
-                    "code": "DB_UPDATE_ERROR"
-                }
-            )
+        # Update user
+        update_user_rewards(req.user_id, {
+            "ecoPoints": new_eco_points,
+            "rank": new_rank,
+            "actions": actions[-100:]  # Keep last 100 actions
+        })
         
-        # Check for new badges with error handling
-        new_badges = []
-        try:
-            user = get_user_rewards(req.user_id)  # Reload
-            new_badges = check_badge_eligibility(req.user_id, new_eco_points, req.action_type)
-            
-            if new_badges:
-                current_badges = user.get("badges", [])
-                if not isinstance(current_badges, list):
-                    current_badges = []
-                current_badges.extend(new_badges)
-                try:
-                    update_user_rewards(req.user_id, {"badges": current_badges})
-                except Exception as badge_error:
-                    logger.error(f"Failed to save new badges: {badge_error}")
-                    # Don't fail the whole request if badge save fails
-        except Exception as badge_check_error:
-            logger.error(f"Error checking badge eligibility: {badge_check_error}")
-            # Continue without badges if check fails
+        # Check for new badges
+        user = get_user_rewards(req.user_id)  # Reload
+        new_badges = check_badge_eligibility(req.user_id, new_eco_points, req.action_type)
         
-        # Format badge details safely
-        badge_details = []
-        for bid in new_badges:
-            if bid in BADGE_DEFINITIONS:
-                badge_details.append(BADGE_DEFINITIONS[bid])
+        if new_badges:
+            current_badges = user.get("badges", [])
+            current_badges.extend(new_badges)
+            update_user_rewards(req.user_id, {"badges": current_badges})
         
-        logger.info(f"Successfully updated rewards for {req.user_id}: +{points_earned} points")
+        logger.info(f"Successfully updated rewards for user {req.user_id}: +{points_earned} points")
         
         return {
             "success": True,
             "points_earned": points_earned,
             "total_points": new_eco_points,
             "rank": new_rank,
-            "new_badges": badge_details,
+            "new_badges": [BADGE_DEFINITIONS[bid] for bid in new_badges],
             "action": action
         }
+        
     except HTTPException:
         raise
-    except ValueError as ve:
-        logger.warning(f"Validation error in update_rewards: {ve}")
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "success": False,
-                "status": "validation_error",
-                "message": str(ve),
-                "code": "VALIDATION_ERROR"
-            }
-        )
+    except ValueError as e:
+        logger.warning(f"Validation error in update_rewards: {e}")
+        raise HTTPException(status_code=400, detail="Invalid request data")
     except Exception as e:
-        logger.error(f"Unexpected error in update_rewards: {e}")
+        logger.error(f"Server error in update_rewards: {e}")
         logger.error(traceback.format_exc())
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "success": False,
-                "status": "internal_error",
-                "message": "An unexpected error occurred. Please try again later.",
-                "code": "INTERNAL_ERROR",
-                "details": {"error": str(e)} if os.getenv("DEBUG", "false").lower() == "true" else None
-            }
-        )
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/leaderboard")
 def get_leaderboard(limit: int = 100, region: Optional[str] = None):
     """Get global or regional leaderboard"""
     try:
-        # Validate limit
-        if limit < 1:
+        # Input validation
+        if not isinstance(limit, int) or limit <= 0:
             limit = 100
-        if limit > 1000:
-            limit = 1000  # Cap at 1000 for performance
+        if limit > 1000:  # Prevent excessive data transfer
+            limit = 1000
+            
+        if region and not isinstance(region, str):
+            region = None
+            
+        logger.info(f"Fetching leaderboard with limit {limit}, region: {region}")
         
-        # Load database with error handling
-        try:
-            db = load_rewards_db()
-        except Exception as db_error:
-            logger.error(f"Database error loading leaderboard: {db_error}")
-            raise HTTPException(
-                status_code=503,
-                detail={
-                    "success": False,
-                    "status": "database_error",
-                    "message": "Failed to load leaderboard data. Please try again.",
-                    "code": "DB_LOAD_ERROR"
-                }
-            )
+        db = load_rewards_db()
         
-        if not isinstance(db, dict):
-            logger.warning("Invalid database structure, returning empty leaderboard")
-            return {
-                "success": True,
-                "leaderboard": [],
-                "region": region or "global",
-                "total_users": 0
-            }
-        
-        # Convert to list and sort by points with error handling
+        # Convert to list and sort by points
         users = []
         for user_id, user_data in db.items():
             try:
                 if not isinstance(user_data, dict):
                     continue
-                
-                # Safely extract data with defaults
-                eco_points = int(user_data.get("ecoPoints", 0)) if isinstance(user_data.get("ecoPoints"), (int, float)) else 0
-                rank = int(user_data.get("rank", 0)) if isinstance(user_data.get("rank"), (int, float)) else 0
-                badges = list(user_data.get("badges", [])) if isinstance(user_data.get("badges"), list) else []
-                
+                    
                 users.append({
-                    "user_id": str(user_id),
-                    "ecoPoints": eco_points,
-                    "rank": rank,
-                    "badges": badges,
-                    "badge_count": len(badges)
+                    "user_id": user_id,
+                    "ecoPoints": int(user_data.get("ecoPoints", 0)),
+                    "rank": int(user_data.get("rank", 0)),
+                    "badges": list(user_data.get("badges", [])),
+                    "badge_count": len(user_data.get("badges", []))
                 })
-            except Exception as user_error:
-                logger.warning(f"Error processing user {user_id} for leaderboard: {user_error}")
+            except Exception as e:
+                logger.warning(f"Error processing user {user_id} for leaderboard: {e}")
                 continue
         
-        # Sort by points (descending) with error handling
-        try:
-            users.sort(key=lambda x: (x.get("ecoPoints", 0), x.get("badge_count", 0)), reverse=True)
-        except Exception as sort_error:
-            logger.error(f"Error sorting leaderboard: {sort_error}")
-            # Return unsorted if sort fails
-            pass
+        # Sort by points (descending)
+        users.sort(key=lambda x: x["ecoPoints"], reverse=True)
         
         # Add position
         for i, user in enumerate(users[:limit]):
             user["position"] = i + 1
         
-        logger.info(f"Successfully loaded leaderboard: {len(users)} users, limit={limit}")
+        logger.info(f"Successfully generated leaderboard with {len(users[:limit])} users")
         
         return {
             "success": True,
@@ -559,174 +483,82 @@ def get_leaderboard(limit: int = 100, region: Optional[str] = None):
             "region": region or "global",
             "total_users": len(users)
         }
-    except HTTPException:
-        raise
+        
     except Exception as e:
-        logger.error(f"Unexpected error in get_leaderboard: {e}")
+        logger.error(f"Server error in get_leaderboard: {e}")
         logger.error(traceback.format_exc())
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "success": False,
-                "status": "internal_error",
-                "message": "An unexpected error occurred while loading the leaderboard.",
-                "code": "INTERNAL_ERROR"
-            }
-        )
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/user/{user_id}")
 def get_user_rewards_data(user_id: str):
     """Get user's rewards data"""
     try:
-        # Validate user_id
+        # Input validation
         if not user_id or not isinstance(user_id, str) or len(user_id.strip()) == 0:
-            raise HTTPException(
-                status_code=400,
-                detail={
-                    "success": False,
-                    "status": "validation_error",
-                    "message": "Invalid user_id provided",
-                    "code": "INVALID_USER_ID"
-                }
-            )
+            logger.warning(f"Invalid user_id in get_user_rewards_data: {user_id}")
+            raise HTTPException(status_code=400, detail="Invalid user ID provided")
         
-        user_id = user_id.strip()
+        logger.info(f"Fetching rewards data for user {user_id}")
         
-        # Get user data with error handling
-        try:
-            user = get_user_rewards(user_id)
-        except Exception as db_error:
-            logger.error(f"Database error getting user rewards: {db_error}")
-            raise HTTPException(
-                status_code=503,
-                detail={
-                    "success": False,
-                    "status": "database_error",
-                    "message": "Failed to access user data. Please try again.",
-                    "code": "DB_ACCESS_ERROR"
-                }
-            )
+        user = get_user_rewards(user_id)
         
-        if not isinstance(user, dict):
-            logger.warning(f"Invalid user data structure for {user_id}")
-            user = {}
-        
-        # Get badge details with error handling
+        # Get badge details
         badge_details = []
         try:
-            badges = user.get("badges", [])
-            if not isinstance(badges, list):
-                badges = []
-            
-            for badge_id in badges:
-                if isinstance(badge_id, str) and badge_id in BADGE_DEFINITIONS:
+            for badge_id in user.get("badges", []):
+                if badge_id in BADGE_DEFINITIONS:
                     badge_details.append({
                         "id": badge_id,
                         **BADGE_DEFINITIONS[badge_id]
                     })
-        except Exception as badge_error:
-            logger.warning(f"Error processing badges for {user_id}: {badge_error}")
+        except Exception as e:
+            logger.warning(f"Error processing badges for user {user_id}: {e}")
         
-        # Calculate stats with error handling
+        # Calculate stats
         try:
             actions = user.get("actions", [])
-            if not isinstance(actions, list):
-                actions = []
-            
-            total_actions = len(actions)
-            carbon_offset = 0.0
-            
-            for action in actions:
-                if isinstance(action, dict):
-                    if action.get("type") == "carbon_offset":
-                        try:
-                            amount = float(action.get("amount", 0))
-                            if amount > 0:
-                                carbon_offset += amount
-                        except (ValueError, TypeError):
-                            pass
-        except Exception as stats_error:
-            logger.warning(f"Error calculating stats for {user_id}: {stats_error}")
+            total_actions = len(actions) if isinstance(actions, list) else 0
+            carbon_offset = sum(
+                a.get("amount", 0) for a in actions 
+                if isinstance(a, dict) and a.get("type") == "carbon_offset"
+            )
+        except Exception as e:
+            logger.warning(f"Error calculating stats for user {user_id}: {e}")
             total_actions = 0
-            carbon_offset = 0.0
-            actions = []
+            carbon_offset = 0
         
-        # Get leaderboard position with error handling
+        # Get leaderboard position
         position = None
         try:
             db = load_rewards_db()
-            if isinstance(db, dict):
-                all_users = []
-                for uid, data in db.items():
-                    if isinstance(data, dict):
-                        try:
-                            points = int(data.get("ecoPoints", 0)) if isinstance(data.get("ecoPoints"), (int, float)) else 0
-                            all_users.append((str(uid), points))
-                        except (ValueError, TypeError):
-                            continue
-                
-                all_users.sort(key=lambda x: x[1], reverse=True)
-                position = next((i + 1 for i, (uid, _) in enumerate(all_users) if uid == user_id), None)
-        except Exception as pos_error:
-            logger.warning(f"Error calculating position for {user_id}: {pos_error}")
+            all_users = []
+            for uid, data in db.items():
+                if isinstance(data, dict):
+                    all_users.append((uid, int(data.get("ecoPoints", 0))))
+            
+            all_users.sort(key=lambda x: x[1], reverse=True)
+            position = next((i + 1 for i, (uid, _) in enumerate(all_users) if uid == user_id), None)
+        except Exception as e:
+            logger.warning(f"Error calculating position for user {user_id}: {e}")
         
-        # Safely get user values
-        eco_points = int(user.get("ecoPoints", 0)) if isinstance(user.get("ecoPoints"), (int, float)) else 0
-        rank = int(user.get("rank", 0)) if isinstance(user.get("rank"), (int, float)) else 0
-        
-        # Get recent actions safely
-        recent_actions = actions[-10:] if isinstance(actions, list) else []
+        logger.info(f"Successfully fetched rewards data for user {user_id}")
         
         return {
             "success": True,
             "user_id": user_id,
-            "ecoPoints": eco_points,
-            "rank": rank,
+            "ecoPoints": user.get("ecoPoints", 0),
+            "rank": user.get("rank", 0),
             "position": position,
             "badges": badge_details,
-            "stats": {
-                "total_actions": total_actions,
-                "carbon_offset_tons": round(carbon_offset, 2),
-                "badge_count": len(badge_details)
-            },
-            "recent_actions": recent_actions
+            "total_actions": total_actions,
+            "carbon_offset": carbon_offset,
+            "created_at": user.get("created_at"),
+            "updated_at": user.get("updated_at")
         }
+        
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Unexpected error in get_user_rewards_data: {e}")
+        logger.error(f"Server error in get_user_rewards_data: {e}")
         logger.error(traceback.format_exc())
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "success": False,
-                "status": "internal_error",
-                "message": "An unexpected error occurred while fetching user rewards.",
-                "code": "INTERNAL_ERROR"
-            }
-        )
-
-@router.get("/badges")
-def get_badge_definitions():
-    """Get all available badge definitions"""
-    try:
-        # Validate badge definitions exist
-        if not BADGE_DEFINITIONS or not isinstance(BADGE_DEFINITIONS, dict):
-            logger.warning("Badge definitions are missing or invalid")
-            return {
-                "success": True,
-                "badges": {}
-            }
-        
-        return {
-            "success": True,
-            "badges": BADGE_DEFINITIONS
-        }
-    except Exception as e:
-        logger.error(f"Error getting badge definitions: {e}")
-        # Return empty badges on error rather than failing
-        return {
-            "success": True,
-            "badges": {}
-        }
-
+        raise HTTPException(status_code=500, detail="Internal server error")
