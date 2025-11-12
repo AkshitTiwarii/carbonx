@@ -561,4 +561,11 @@ def get_user_rewards_data(user_id: str):
     except Exception as e:
         logger.error(f"Server error in get_user_rewards_data: {e}")
         logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error")# Check frontend logs (most likely to have issues)
+        docker-compose -f docker-compose.dev.yml logs -f frontend
+
+        # Check backend logs
+        docker-compose -f docker-compose.dev.yml logs -f backend
+
+        # Check blockchain logs
+        docker-compose -f docker-compose.dev.yml logs -f blockchain
