@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import WelcomeModal from "../components/WelcomeModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,8 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={inter.className}>
         <ThirdwebProvider>
+
+          <WelcomeModal />
           <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
             <NavBar />
             <main className="flex-1">{children}</main>
