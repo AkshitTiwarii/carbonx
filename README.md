@@ -1,3 +1,35 @@
+## 📑 Table of Contents
+
+- [🌱 CarbonX - AI-Powered Carbon Credit Trading Platform](#-carbonx---ai-powered-carbon-credit-trading-platform)
+- [🚀 Live Demo](#-live-demo)
+- [✨ Features](#-features)
+  - [🤖 AI-Powered Tools](#-ai-powered-tools)
+  - [💹 Carbon Trading & Finance](#-carbon-trading--finance)
+  - [🌐 Web3 & Blockchain](#-web3--blockchain)
+  - [🎨 User Experience](#-user-experience)
+- [🛠️ Technology Stack](#️-technology-stack)
+  - [Frontend](#frontend)
+  - [AI & Backend](#ai--backend)
+  - [Blockchain & Web3](#blockchain--web3)
+  - [DevOps & Deployment](#devops--deployment)
+- [🚀 Quick Start](#-quick-start)
+  - [Option 1: Docker](#option-1-docker-recommended)
+  - [Option 2: Manual Setup](#option-2-manual-setup)
+- [📱 Application Structure](#-application-structure)
+- [🤖 AI Features](#-ai-features)
+  - [Carbon Calculator](#carbon-calculator)
+  - [Plastic Footprint Analyzer](#plastic-footprint-analyzer)
+  - [Event Planner](#event-planner)
+  - [Chatbot Assistant](#chatbot-assistant)
+- [🔗 API Documentation](#-api-documentation)
+- [🌍 Environmental Impact](#-environmental-impact)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [👨‍💻 Developer](#-developer)
+- [🙏 Acknowledgments](#-acknowledgments)
+- [📊 Project Stats](#-project-stats)
+- [✨ Contributors](#-contributors)
+
 # 🌱 CarbonX - AI-Powered Carbon Credit Trading Platform
 
 > **Next-generation sustainability platform combining AI tools, carbon credit trading, and blockchain technology for environmental impact management.**
