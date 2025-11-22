@@ -219,12 +219,24 @@ function FeatureCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-br from-indigo-200 via-fuchsia-200 to-pink-100">
-      <div className="relative rounded-2xl bg-white border border-zinc-200 p-6 dark:bg-zinc-900 dark:border-zinc-800">
-        <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-300/20 blur-2xl" />
-        <div className="mb-3 text-indigo-600 dark:text-indigo-300">{icon}</div>
-        <h3 className="text-xl font-semibold mb-1 text-zinc-900 dark:text-zinc-100">{title}</h3>
+    <div className="group relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-br from-indigo-200 via-fuchsia-200 to-pink-100 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-2 hover:shadow-[0_20px_40px_-12px_rgba(99,102,241,0.4)] cursor-pointer">
+      <div className="relative rounded-2xl bg-white border border-zinc-200 p-6 dark:bg-zinc-900 dark:border-zinc-800 transition-all duration-300 group-hover:border-indigo-400 dark:group-hover:border-indigo-500">
+        <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-300/20 blur-2xl transition-opacity duration-300 group-hover:bg-emerald-300/30" />
+        
+        
+        <div className="mb-3 text-indigo-600 dark:text-indigo-300 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+          {icon}
+        </div>
+        
+       
+        <h3 className="text-xl font-semibold mb-1 text-zinc-900 dark:text-zinc-100 transition-colors duration-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+          {title}
+        </h3>
+        
         <p className="text-zinc-700 dark:text-zinc-300 text-sm">{desc}</p>
+        
+
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-fuchsia-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none" />
       </div>
     </div>
   );
@@ -268,7 +280,7 @@ function StatsRow() {
   );
 }
 
-// Minimal inline icons (no external deps)
+// Minimal inline icons 
 function IconSpark() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-emerald-300">
@@ -313,4 +325,5 @@ function IconWallet() {
     </svg>
   );
 }
+
 
