@@ -11,7 +11,8 @@ import {
   MapPin,
   ShoppingCart,
   PieChart,
-  Calendar
+  Calendar,
+  Droplet
 } from "lucide-react";
 
 const features = [
@@ -54,6 +55,14 @@ const features = [
     href: "/plastic-calculator",
     gradient: "from-cyan-600 to-blue-600",
     badge: "AI"
+  },
+  {
+    title: "Water Footprint Calculator",
+    description: "Estimate your water consumption and get personalized conservation tips",
+    icon: Droplet,
+    href: "/water-calculator",
+    gradient: "from-blue-600 to-cyan-600",
+    badge: "NEW"
   },
   {
     title: "Sustainable Alternatives",

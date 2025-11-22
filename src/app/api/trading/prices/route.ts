@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 // Mock trading data - in production, this would connect to a real exchange API
 interface MarketData {
   symbol: string;

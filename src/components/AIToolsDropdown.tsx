@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Calculator, Recycle, Calendar, Leaf, MessageCircle, TrendingUp, BarChart3 } from "lucide-react";
+import { ChevronDown, Calculator, Recycle, Calendar, Leaf, MessageCircle, TrendingUp, BarChart3, Droplet } from "lucide-react";
 
 interface AITool {
   id: string;
@@ -34,6 +34,15 @@ const AI_TOOLS: AITool[] = [
     status: 'available'
   },
   {
+    id: 'water-calculator',
+    name: 'Water Footprint Calculator',
+    description: 'Estimate your water consumption and discover personalized conservation tips based on your lifestyle',
+    href: '/water-calculator',
+    icon: <Droplet className="w-5 h-5" />,
+    badge: 'NEW',
+    status: 'available'
+  },
+  {
     id: 'event-planner',
     name: 'Sustainable Event Planner',
     description: 'Plan eco-friendly events with AI-powered sustainability recommendations and carbon tracking',
@@ -50,6 +59,33 @@ const AI_TOOLS: AITool[] = [
     icon: <MessageCircle className="w-5 h-5" />,
     badge: 'BETA',
     status: 'coming-soon'
+  },
+  {
+    id: 'portfolio-optimizer',
+    name: 'Portfolio Optimizer',
+    description: 'Optimize your investment portfolio with AI-driven ESG and sustainability insights',
+    href: '/portfolio-optimizer',
+    icon: <TrendingUp className="w-5 h-5" />,
+    badge: 'AI',
+    status: 'available'
+  },
+  {
+    id: 'impact-dashboard',
+    name: 'Impact Dashboard',
+    description: 'Track and visualize your environmental impact with comprehensive analytics and reporting',
+    href: '/impact-dashboard',
+    icon: <BarChart3 className="w-5 h-5" />,
+    badge: 'NEW',
+    status: 'available'
+  },
+  {
+    id: 'sustainable-alternatives',
+    name: 'Sustainable Alternatives',
+    description: 'Discover eco-friendly alternatives to everyday products with AI-powered recommendations',
+    href: '/sustainable-alternatives',
+    icon: <Leaf className="w-5 h-5" />,
+    badge: 'AI',
+    status: 'available'
   }
 ];
 
@@ -109,7 +145,7 @@ export default function AIToolsDropdown({ isOpen, onClose, triggerRef }: AITools
   return (
     <div
       ref={dropdownRef}
-      className="absolute top-full left-0 mt-2 w-96 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden"
+      className="absolute top-full left-0 mt-2 w-96 max-h-[80vh] bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col"
     >
       {/* Header */}
       <div className="p-4 border-b border-zinc-800 bg-gradient-to-r from-purple-500/10 to-cyan-500/10">
@@ -117,83 +153,86 @@ export default function AIToolsDropdown({ isOpen, onClose, triggerRef }: AITools
         <p className="text-sm text-zinc-400">Intelligent solutions for sustainability management</p>
       </div>
 
-      {/* Available Tools */}
-      <div className="p-2">
-        <div className="mb-3">
-          <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Available Now</h4>
-        </div>
-        {availableTools.map((tool) => (
-          <Link
-            key={tool.id}
-            href={tool.href}
-            onClick={onClose}
-            className="block p-3 rounded-lg hover:bg-zinc-800/60 transition-colors group"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 p-2 bg-zinc-800/50 rounded-lg group-hover:bg-zinc-700/60 transition-colors">
-                {tool.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h5 className="font-medium text-zinc-100 group-hover:text-white transition-colors">
-                    {tool.name}
-                  </h5>
-                  {tool.badge && (
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
-                      {tool.badge}
-                    </span>
-                  )}
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto ai-tools-scroll" style={{ scrollbarWidth: 'thin', scrollbarColor: '#3f3f46 transparent' }}>
+        {/* Available Tools */}
+        <div className="p-2">
+          <div className="mb-3">
+            <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Available Now</h4>
+          </div>
+          {availableTools.map((tool) => (
+            <Link
+              key={tool.id}
+              href={tool.href}
+              onClick={onClose}
+              className="block p-3 rounded-lg hover:bg-zinc-800/60 transition-colors group"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 p-2 bg-zinc-800/50 rounded-lg group-hover:bg-zinc-700/60 transition-colors">
+                  {tool.icon}
                 </div>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  {tool.description}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h5 className="font-medium text-zinc-100 group-hover:text-white transition-colors">
+                      {tool.name}
+                    </h5>
+                    {tool.badge && (
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
+                        {tool.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    {tool.description}
+                  </p>
+                </div>
               </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Coming Soon Tools */}
+        {comingSoonTools.length > 0 && (
+          <>
+            <div className="border-t border-zinc-800"></div>
+            <div className="p-2">
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Coming Soon</h4>
+              </div>
+              {comingSoonTools.map((tool) => (
+                <div
+                  key={tool.id}
+                  className="block p-3 rounded-lg opacity-60 cursor-not-allowed"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 p-2 bg-zinc-800/30 rounded-lg">
+                      {tool.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h5 className="font-medium text-zinc-300">
+                          {tool.name}
+                        </h5>
+                        {tool.badge && (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
+                            {tool.badge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-zinc-500 leading-relaxed">
+                        {tool.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </Link>
-        ))}
+          </>
+        )}
       </div>
 
-      {/* Coming Soon Tools */}
-      {comingSoonTools.length > 0 && (
-        <>
-          <div className="border-t border-zinc-800"></div>
-          <div className="p-2">
-            <div className="mb-3">
-              <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wide px-2 py-1">Coming Soon</h4>
-            </div>
-            {comingSoonTools.map((tool) => (
-              <div
-                key={tool.id}
-                className="block p-3 rounded-lg opacity-60 cursor-not-allowed"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 p-2 bg-zinc-800/30 rounded-lg">
-                    {tool.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h5 className="font-medium text-zinc-300">
-                        {tool.name}
-                      </h5>
-                      {tool.badge && (
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getBadgeColor(tool.badge)}`}>
-                          {tool.badge}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-zinc-500 leading-relaxed">
-                      {tool.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
       {/* Footer */}
-      <div className="border-t border-zinc-800 p-4 bg-zinc-900/50">
+      <div className="border-t border-zinc-800 p-4 bg-zinc-900/50 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-zinc-400">More tools coming soon</p>

@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Hardhat blockchain node
+  blockchain:
+    build:
+      context: .
+      dockerfile: Dockerfile.blockchain
+    container_name: carbonx-blockchain
+    ports:
+      - "8545:8545"
+    volumes:
+      - blockchain_data:/app/data
+    networks:
+      - carbonx-network
+    restart: unless-stopped
+
+  # FastAPI backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: carbonx-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - carbonx-network
+    depends_on:
+      - blockchain
+    restart: unless-stopped
+
+  # Next.js frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: carbonx-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE=http://backend:8000
+      - NEXT_PUBLIC_BLOCKCHAIN_URL=http://blockchain:8545
+    networks:
+      - carbonx-network
+    depends_on:
+      - backend
+      - blockchain
+    restart: unless-stopped
+
+volumes:
+  blockchain_data:
+  backend_data:
+
+networks:
+  carbonx-network:
+    driver: bridge

@@ -1,3 +1,35 @@
+## 📑 Table of Contents
+
+- [🌱 CarbonX - AI-Powered Carbon Credit Trading Platform](#-carbonx---ai-powered-carbon-credit-trading-platform)
+- [🚀 Live Demo](#-live-demo)
+- [✨ Features](#-features)
+  - [🤖 AI-Powered Tools](#-ai-powered-tools)
+  - [💹 Carbon Trading & Finance](#-carbon-trading--finance)
+  - [🌐 Web3 & Blockchain](#-web3--blockchain)
+  - [🎨 User Experience](#-user-experience)
+- [🛠️ Technology Stack](#️-technology-stack)
+  - [Frontend](#frontend)
+  - [AI & Backend](#ai--backend)
+  - [Blockchain & Web3](#blockchain--web3)
+  - [DevOps & Deployment](#devops--deployment)
+- [🚀 Quick Start](#-quick-start)
+  - [Option 1: Docker](#option-1-docker-recommended)
+  - [Option 2: Manual Setup](#option-2-manual-setup)
+- [📱 Application Structure](#-application-structure)
+- [🤖 AI Features](#-ai-features)
+  - [Carbon Calculator](#carbon-calculator)
+  - [Plastic Footprint Analyzer](#plastic-footprint-analyzer)
+  - [Event Planner](#event-planner)
+  - [Chatbot Assistant](#chatbot-assistant)
+- [🔗 API Documentation](#-api-documentation)
+- [🌍 Environmental Impact](#-environmental-impact)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [👨‍💻 Developer](#-developer)
+- [🙏 Acknowledgments](#-acknowledgments)
+- [📊 Project Stats](#-project-stats)
+- [✨ Contributors](#-contributors)
+
 # 🌱 CarbonX - AI-Powered Carbon Credit Trading Platform
 
 > **Next-generation sustainability platform combining AI tools, carbon credit trading, and blockchain technology for environmental impact management.**
@@ -9,7 +41,7 @@
 
 ## 🚀 Live Demo
 
-**🔗 [Visit CarbonX Platform](http://localhost:3002)** *(Running locally)*
+**🔗 [Visit CarbonX Platform](http://localhost:3000)** *(Running locally)*
 
 ## ✨ Features
 
@@ -56,46 +88,62 @@
 - **Web3 Library**: ThirdWeb + Ethers.js
 - **Wallet**: MetaMask integration
 
+### DevOps & Deployment
+- **Containerization**: Docker + Docker Compose
+- **Development**: Hot reload for all services
+- **Production**: Multi-stage builds with optimization
+- **Orchestration**: Service networking and health checks
+
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js 18.x or higher
-- npm or yarn package manager
-- MetaMask browser extension (for Web3 features)
-- Google AI API key (for AI features)
+### Option 1: Docker (Recommended)
 
-### Installation
+**Prerequisites**: Docker and Docker Compose
 
-1. **Clone the repository**
 ```bash
+# Clone repository
 git clone https://github.com/AkshitTiwarii/carbonx.git
 cd carbonx
+
+# Set up environment
+cp .env.example .env.local
+# Add your API keys to .env.local
+
+# Start entire stack
+docker-compose -f docker-compose.dev.yml up -d
+
+# Access application
+open http://localhost:3000
 ```
 
-2. **Install dependencies**
+### Option 2: Manual Setup
+
+**Prerequisites**: Node.js 18+, Python 3.8+
+
+1. **Install dependencies**
 ```bash
 npm install
+cd backend && pip install -r requirements.txt
+cd ../smart_contracts && npm install
 ```
 
-3. **Set up environment variables**
+2. **Set up environment**
 ```bash
 cp .env.example .env.local
+# Add your API keys
 ```
 
-Add your API keys to `.env.local`:
-```env
-GEMINI_API_KEY=your_google_ai_api_key_here
-THIRDWEB_API_KEY=your_thirdweb_api_key_here
-NEXTAUTH_URL=http://localhost:3002
-```
-
-4. **Start the development server**
+3. **Start services**
 ```bash
+# Terminal 1: Blockchain
+cd smart_contracts && npx hardhat node
+
+# Terminal 2: Backend
+cd backend && uvicorn main:app --reload
+
+# Terminal 3: Frontend
 npm run dev
 ```
-
-5. **Open your browser**
-Navigate to `http://localhost:3002` to see the application.
 
 ## 📱 Application Structure
 
@@ -179,7 +227,9 @@ CarbonX is committed to sustainability:
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Here's how you can help:
+We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
+
+### Quick Start for Contributors
 
 1. **Fork the repository**
 2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
@@ -187,15 +237,20 @@ We welcome contributions from the community! Here's how you can help:
 4. **Push to the branch** (`git push origin feature/amazing-feature`)
 5. **Open a Pull Request**
 
+For detailed contribution guidelines, code standards, and best practices, please read our [**Contributing Guide**](CONTRIBUTING.md).
+
 ### Development Guidelines
 - Follow TypeScript best practices
 - Use Tailwind CSS for styling
 - Write tests for new features
 - Update documentation as needed
+- Create an issue before working on major features
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE.md](LICENSE.md) file for full details.
+
+You are free to use, modify, and distribute this project in accordance with the license terms.
 
 ## 👨‍💻 Developer
 
@@ -222,10 +277,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## ✨ Contributors
+
+
+#### Thanks to all the wonderful contributors 💖
+
+<a href="https://github.com/AkshitTiwarii/carbonx/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=AkshitTiwarii/carbonx" />
+</a>
+
+
+#### See full list of contributor contribution [Contribution Graph](https://github.com/AkshitTiwarii/carbonx/graphs/contributors)  
 <div align="center">
+
+---
 
 **🌱 Building a sustainable future with AI and blockchain technology**
 
 [⭐ Star this repository](https://github.com/AkshitTiwarii/carbonx) if you find it helpful!
 
 </div>
+
