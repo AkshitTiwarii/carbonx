@@ -11,6 +11,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "CarbonX | AI + Web3 Carbon Credit Exchange",
   description: "Buy, sell, and offset carbon credits with AI and blockchain.",
+  icons: {
+    icon: "/favicon-v2.ico",
+  },
+
 };
 
 export default function RootLayout({
